@@ -1,6 +1,5 @@
 from IPython.core.debugger import set_trace
 from importlib import reload
-# from astropy.table import Table, Column
 import matplotlib.pyplot as plt
 import numpy as np
 import rosbag_parser

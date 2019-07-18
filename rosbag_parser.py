@@ -1,4 +1,4 @@
-#be sure to specify foldername in this file and the true value in rosbag_data.py
+#be sure to specify foldername in this file
 from IPython.core.debugger import set_trace
 
 import rosbag
