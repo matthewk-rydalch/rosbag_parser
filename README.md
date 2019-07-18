@@ -10,5 +10,3 @@ In the for loop specify the topic and variables you need.  Also initialize array
 In rosbag_data.py:
 Change the variable names to match the variables selected in the parser.
 The rest of the script can be modified to plot and calculate whatever is needed from the selected variables.
-
-test
