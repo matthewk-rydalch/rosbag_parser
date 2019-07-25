@@ -3,23 +3,27 @@ from IPython.core.debugger import set_trace
 
 import rosbag
 
-foldername = '125cm_centered_lazy'
-bag = rosbag.Bag(foldername + '/data.bag')
-
+foldername = 'redo_rod/one'
+bag = rosbag.Bag('../../../data/' + foldername + '/data2.bag')
 relPosNED = []
+relPosNEDHP = []
 relPosLength = []
+relPosHPLength = []
 flags = []
 secs = []
 nsecs = []
+lla = []
 
-print(bag)
 for topic, msg, t in bag.read_messages(topics=['/rover/RelPos']):
-	#set_trace()
 	relPosNED.append(msg.relPosNED)
+	relPosNEDHP.append(msg.relPosHPNED)
 	relPosLength.append(msg.relPosLength)
+	relPosHPLength.append(msg.relPosHPLength)	
 	flags.append(msg.flags)
 	secs.append(msg.header.stamp.secs)
 	nsecs.append(msg.header.stamp.nsecs)
 
+for topic, msg, t in bag.read_messages(topics=['/rover/PosVelTime']):
+	lla.append(msg.lla)
 
 bag.close()
