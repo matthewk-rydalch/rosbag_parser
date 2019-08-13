@@ -6,12 +6,13 @@ from collections import namedtuple
 
 def main():
 
-	filename = 'aug1_utc_walk_01.bag'
-	bag = rosbag.Bag('../../../data/UTC_test/' + filename)
+	filename = '0812_mob03.bag'
+	bag = rosbag.Bag('../../../data/walk_addutc/' + filename)
 	# bag = rosbag.Bag(filename)
-	# foldername = 'redo_lazy/two/'
-	# bag = rosbag.Bag('../../../data/' + foldername + 'data.bag')
+	# foldername = 'redo_rod/one/'
+	# bag = rosbag.Bag('../../../data/' + foldername + 'data_fixed.bag')
 	data = Parser()
+	# variables = data.get_varaibles(bag, foldername)
 	variables = data.get_variables(bag, filename)
 	bag.close()
 	return variables
