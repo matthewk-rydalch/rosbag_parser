@@ -6,8 +6,9 @@ from collections import namedtuple
 
 def main():
 
-	filename = '0812_mob03.bag'
-	bag = rosbag.Bag('../../../data/walk_addutc/' + filename)
+	filename = 'mob03.bag'
+	bag = rosbag.Bag('../../../data/08_22_walk/' + filename)
+	set_trace()
 	# bag = rosbag.Bag(filename)
 	# foldername = 'redo_rod/one/'
 	# bag = rosbag.Bag('../../../data/' + foldername + 'data_fixed.bag')
