@@ -12,7 +12,7 @@ def main():
 
 	
 
-	filename = 'rover-10-4-stationary.bag'
+	filename = 'rover-10-17-stationary-test.bag'
 	bag = rosbag.Bag('../rtk_tests/stationary/' + filename)
 	# bag = rosbag.Bag(filename)
 	# foldername = 'redo_rod/one/'
@@ -34,6 +34,7 @@ def main():
 	up = []
 	time = []
 
+
 	#Find the flags
 	flags = variables.flags
 
@@ -45,6 +46,23 @@ def main():
 		east.append(variables.relPosNED[i][1])
 		up.append(-1*variables.relPosNED[i][2])
 		time.append(variables.secs_rel[i]-variables.secs_rel[0])
+
+	#Create blank arrays for velNED
+	velnorth = variables.velNED
+	veleast = []
+	veldown = []
+
+	#Find timestamp
+	veltime = variables.sec - variables.sec[0]
+
+	for i in range(0, len(veltime)):
+
+		velnorth.append(variables.velNED[i][0])
+		veleast.append(variables.velNED[i][1])
+		velup.append(-1*variables.velNED[i][2])
+
+
+
 
 	figurenorth = plt.figure()
 	figurenorth.suptitle('Stationary Test North')
@@ -80,6 +98,18 @@ def main():
 	plt.plot(time, [stat.mean(up)]*len(time), 'r--', label = 'Mean Average: %.3f meters' %stat.mean(up))
 	plt.plot(time, [stat.mean(up)-stat.stdev(up)]*len(time), 'g--', label = 'Standard Deviation: %.3f meters' %stat.stdev(up))
 	plt.plot(time, [stat.mean(up)+stat.stdev(up)]*len(time), 'g--')
+	plt.legend()
+
+	figurevelnorth = plt.figure()
+	figurevelnorth.suptitle('Stationary Test Velocity North')
+	plt.xlabel('Time (sec)')
+	plt.ylabel('Velocity North (m/s)')
+	plt.axis([0, time[len(veltime)-1], stat.mean(velnorth)-2*stat.stdev(velnorth), 
+		stat.mean(velnorth)+2*stat.stdev(velnorth)])
+	plt.scatter(time, velnorth, 1, label = 'Data')
+	plt.plot(time, [stat.mean(velnorth)]*len(time), 'r--', label = 'Mean Average: %.3f m/s' %stat.mean(velnorth))
+	plt.plot(time, [stat.mean(velnorth)-stat.stdev(velnorth)]*len(time), 'g--', label = 'Standard Deviation: %.3f m/s' %stat.stdev(velnorth))
+	plt.plot(time, [stat.mean(velnorth)+stat.stdev(velnorth)]*len(time), 'g--')
 	plt.legend()
 
 
@@ -200,6 +230,8 @@ class Parser:
 		minute = []
 		sec = []
 		nano = []
+		velNED = [] #NED Velocity (m/s)
+
 		# set_trace()
 		for topic, msg, t in bag.read_messages(topics=['/rover/RelPos']):
 			relPosNED.append(msg.relPosNED)
@@ -221,6 +253,7 @@ class Parser:
 			minute.append(msg.min)
 			sec.append(msg.sec)
 			nano.append(msg.nano)
+			velNED.append(msg.velNED)
 
 		for topic, msg, t in bag.read_messages(topics=['/rover/PosVelEcef']):
 			position.append(msg.position);
