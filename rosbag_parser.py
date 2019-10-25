@@ -12,8 +12,8 @@ def main():
 
 	
 
-	filename = 'rover-10-17-stationary-test.bag'
-	bag = rosbag.Bag('../rtk_tests/stationary/' + filename)
+	filename = 'rover-10-4-stationary.bag'
+	bag = rosbag.Bag('/home/matt/rtk_tests/stationary/' + filename)
 	# bag = rosbag.Bag(filename)
 	# foldername = 'redo_rod/one/'
 	# bag = rosbag.Bag('../../../data/' + foldername + 'data_fixed.bag')
@@ -48,18 +48,19 @@ def main():
 		time.append(variables.secs_rel[i]-variables.secs_rel[0])
 
 	#Create blank arrays for velNED
-	velnorth = variables.velNED
+	velnorth = []
 	veleast = []
-	veldown = []
+	velup = []
 
 	#Find timestamp
-	veltime = variables.sec - variables.sec[0]
+	veltime = variables.sec
 
 	for i in range(0, len(veltime)):
 
 		velnorth.append(variables.velNED[i][0])
 		veleast.append(variables.velNED[i][1])
 		velup.append(-1*variables.velNED[i][2])
+		veltime[i] = veltime[i]-veltime[0]
 
 
 
@@ -112,6 +113,148 @@ def main():
 	plt.plot(time, [stat.mean(velnorth)+stat.stdev(velnorth)]*len(time), 'g--')
 	plt.legend()
 
+	figureveleast = plt.figure()
+	figureveleast.suptitle('Stationary Test Velocity East')
+	plt.xlabel('Time (sec)')
+	plt.ylabel('Velocity East (m/s)')
+	plt.axis([0, time[len(veltime)-1], stat.mean(veleast)-2*stat.stdev(veleast), 
+		stat.mean(veleast)+2*stat.stdev(veleast)])
+	plt.scatter(time, veleast, 1, label = 'Data')
+	plt.plot(time, [stat.mean(veleast)]*len(time), 'r--', label = 'Mean Average: %.3f m/s' %stat.mean(veleast))
+	plt.plot(time, [stat.mean(veleast)-stat.stdev(veleast)]*len(time), 'g--', label = 'Standard Deviation: %.3f m/s' %stat.stdev(veleast))
+	plt.plot(time, [stat.mean(veleast)+stat.stdev(veleast)]*len(time), 'g--')
+	plt.legend()
+
+	figurevelup = plt.figure()
+	figurevelup.suptitle('Stationary Test Velocity Up')
+	plt.xlabel('Time (sec)')
+	plt.ylabel('Velocity Up (m/s)')
+	plt.axis([0, time[len(veltime)-1], stat.mean(velup)-2*stat.stdev(velup), 
+		stat.mean(velup)+2*stat.stdev(velup)])
+	plt.scatter(time, velup, 1, label = 'Data')
+	plt.plot(time, [stat.mean(velup)]*len(time), 'r--', label = 'Mean Average: %.3f m/s' %stat.mean(velup))
+	plt.plot(time, [stat.mean(velup)-stat.stdev(velup)]*len(time), 'g--', label = 'Standard Deviation: %.3f m/s' %stat.stdev(velup))
+	plt.plot(time, [stat.mean(velup)+stat.stdev(velup)]*len(time), 'g--')
+	plt.legend()
+
+	
+
+
+	#Stationary Test E-W Orientation 22 Oct 2019
+
+	filename = 'rover_eastwest.bag'
+	bagew = rosbag.Bag('/home/matt/rtk_tests/stationary-base-rover/' + filename)
+	variablesew = data.get_variables(bagew, filename)
+	bag.close()
+
+	#Create blank arrays for Rel Position NED Values
+	northew = []
+	eastew = []
+	upew = []
+	timeew = []
+
+
+	#Find the flags
+	flagsew = variablesew.flags
+
+	#Get Relative Position NED Values
+	for i in range(0, len(flagsew)):
+
+		#print(i)
+		northew.append(variablesew.relPosNED[i][0])
+		eastew.append(variablesew.relPosNED[i][1])
+		upew.append(-1*variablesew.relPosNED[i][2])
+		timeew.append(variablesew.secs_rel[i]-variablesew.secs_rel[0])
+
+	#Create blank arrays for velNED
+	velnorthew = []
+	veleastew = []
+	velupew = []
+
+	#Find timestamp
+	veltimeew = variablesew.sec
+
+	for i in range(0, len(veltimeew)):
+
+		velnorthew.append(variablesew.velNED[i][0])
+		veleastew.append(variablesew.velNED[i][1])
+		velupew.append(-1*variablesew.velNED[i][2])
+		veltimeew[i] = veltimeew[i]-veltimeew[0]
+
+
+	figurenorthew = plt.figure()
+	figurenorthew.suptitle('E-W Oriented Stationary Test North')
+	plt.xlabel('Time (sec)')
+	plt.ylabel('North (m)')
+	plt.axis([0, timeew[len(timeew)-1], stat.mean(northew)-2*stat.stdev(northew), 
+		stat.mean(northew)+2*stat.stdev(northew)])
+	plt.scatter(timeew,northew, 1, label = 'Data')
+	plt.plot(timeew, [stat.mean(northew)]*len(timeew), 'r--', label = 'Mean Average: %.3f meters' %stat.mean(northew))
+	plt.plot(timeew, [stat.mean(northew)-stat.stdev(northew)]*len(timeew), 'g--', label = 'Standard Deviation: %.3f meters' %stat.stdev(northew))
+	plt.plot(timeew, [stat.mean(northew)+stat.stdev(northew)]*len(timeew), 'g--')
+	plt.legend()
+
+	figureeastew = plt.figure()
+	figureeastew.suptitle('E-W Oriented Stationary Test East')
+	plt.xlabel('Time (sec)')
+	plt.ylabel('East (m)')
+	plt.axis([0, timeew[len(timeew)-1], stat.mean(eastew)-2*stat.stdev(eastew), 
+		stat.mean(eastew)+2*stat.stdev(eastew)])
+	plt.scatter(timeew, eastew, 1, label = 'Data')
+	plt.plot(timeew, [stat.mean(eastew)]*len(timeew), 'r--', label = 'Mean Average: %.3f meters' %stat.mean(eastew))
+	plt.plot(timeew, [stat.mean(eastew)-stat.stdev(eastew)]*len(timeew), 'g--', label = 'Standard Deviation: %.3f meters' %stat.stdev(eastew))
+	plt.plot(timeew, [stat.mean(eastew)+stat.stdev(eastew)]*len(timeew), 'g--')
+	plt.legend()
+
+	figureupew = plt.figure()
+	figureupew.suptitle('E-W Oriented Stationary Test Up')
+	plt.xlabel('Time (sec)')
+	plt.ylabel('Up')
+	plt.axis([0, timeew[len(timeew)-1], stat.mean(upew)-2*stat.stdev(upew), 
+		stat.mean(upew)+2*stat.stdev(upew)])
+	plt.scatter(timeew, upew, 1, label = 'Data')
+	plt.plot(timeew, [stat.mean(upew)]*len(timeew), 'r--', label = 'Mean Average: %.3f meters' %stat.mean(upew))
+	plt.plot(timeew, [stat.mean(upew)-stat.stdev(upew)]*len(timeew), 'g--', label = 'Standard Deviation: %.3f meters' %stat.stdev(upew))
+	plt.plot(timeew, [stat.mean(upew)+stat.stdev(upew)]*len(timeew), 'g--')
+	plt.legend()
+
+
+	figurevelnorthew = plt.figure()
+	figurevelnorthew.suptitle('E-W Oriented Stationary Test Velocity North')
+	plt.xlabel('Time (sec)')
+	plt.ylabel('Velocity North (m/s)')
+	plt.axis([0, veltimeew[len(veltimeew)-1], stat.mean(velnorthew)-2*stat.stdev(velnorthew), 
+		stat.mean(velnorthew)+2*stat.stdev(velnorthew)])
+	plt.scatter(veltimeew, velnorthew, 1, label = 'Data')
+	plt.plot(veltimeew, [stat.mean(velnorthew)]*len(veltimeew), 'r--', label = 'Mean Average: %.3f m/s' %stat.mean(velnorthew))
+	plt.plot(veltimeew, [stat.mean(velnorthew)-stat.stdev(velnorthew)]*len(veltimeew), 'g--', label = 'Standard Deviation: %.3f m/s' %stat.stdev(velnorthew))
+	plt.plot(veltimeew, [stat.mean(velnorthew)+stat.stdev(velnorthew)]*len(veltimeew), 'g--')
+	plt.legend()
+
+	figureveleastew = plt.figure()
+	figureveleastew.suptitle('E-W Oriented Stationary Test Velocity East')
+	plt.xlabel('Time (sec)')
+	plt.ylabel('Velocity East (m/s)')
+	plt.axis([0, veltimeew[len(veltimeew)-1], stat.mean(veleastew)-2*stat.stdev(veleastew), 
+		stat.mean(veleastew)+2*stat.stdev(veleastew)])
+	plt.scatter(veltimeew, veleastew, 1, label = 'Data')
+	plt.plot(veltimeew, [stat.mean(veleastew)]*len(veltimeew), 'r--', label = 'Mean Average: %.3f m/s' %stat.mean(veleastew))
+	plt.plot(veltimeew, [stat.mean(veleastew)-stat.stdev(veleastew)]*len(veltimeew), 'g--', label = 'Standard Deviation: %.3f m/s' %stat.stdev(veleastew))
+	plt.plot(veltimeew, [stat.mean(veleastew)+stat.stdev(veleastew)]*len(veltimeew), 'g--')
+	plt.legend()
+
+	figurevelupew = plt.figure()
+	figurevelupew.suptitle('E-W Oriented Stationary Test Velocity Up')
+	plt.xlabel('Time (sec)')
+	plt.ylabel('Velocity Up (m/s)')
+	plt.axis([0, veltimeew[len(veltimeew)-1], stat.mean(velupew)-2*stat.stdev(velupew), 
+		stat.mean(velupew)+2*stat.stdev(velupew)])
+	plt.scatter(veltimeew, velupew, 1, label = 'Data')
+	plt.plot(veltimeew, [stat.mean(velupew)]*len(veltimeew), 'r--', label = 'Mean Average: %.3f m/s' %stat.mean(velupew))
+	plt.plot(veltimeew, [stat.mean(velupew)-stat.stdev(velupew)]*len(veltimeew), 'g--', label = 'Standard Deviation: %.3f m/s' %stat.stdev(velupew))
+	plt.plot(veltimeew, [stat.mean(velupew)+stat.stdev(velupew)]*len(veltimeew), 'g--')
+	plt.legend()
+
 
 	#Vertical Test 1
 
@@ -119,17 +262,17 @@ def main():
 	filenames = ["rover-10-4-sliding_post.bag", "rover-10-4-sliding_post_test_2.bag", "rover-10-4-sliding_post_test_3.bag"]
 
 	#Get variables from bag1
-	bag1 = rosbag.Bag('../rtk_tests/altitude/' + filenames[0])
+	bag1 = rosbag.Bag('../../../rtk_tests/altitude/' + filenames[0])
 	variables1 = data.get_variables(bag1,filenames[0])
 	bag1.close()
 
 	#Get variables from bag2
-	bag2 = rosbag.Bag('../rtk_tests/altitude/' + filenames[1])
+	bag2 = rosbag.Bag('../../../rtk_tests/altitude/' + filenames[1])
 	variables2 = data.get_variables(bag2, filenames[1])
 	bag2.close()
 
 	#Get variables from bag3
-	bag3 = rosbag.Bag('../rtk_tests/altitude/' + filenames[2])
+	bag3 = rosbag.Bag('../../../rtk_tests/altitude/' + filenames[2])
 	variables3 = data.get_variables(bag3, filenames[2])
 	bag3.close()
 
@@ -273,11 +416,11 @@ class Parser:
 
 		MyStruct = namedtuple("mystruct", "relPosNED, relPosNEDHP, relPosLength, relPosHPLength, \
 		flags, secs_rel, secs_pos, nsecs_pos, lla, year, month, day, hour, \
-		minute, sec, nano, position, meanXYZ")
+		minute, sec, nano, position, meanXYZ, velNED")
 
 		variables = MyStruct(relPosNED, relPosNEDHP, relPosLength, relPosHPLength, \
 		flags, secs_rel, secs_pos, nsecs_pos, lla, year, month, day, hour, \
-		minute, sec, nano, position, meanXYZ)
+		minute, sec, nano, position, meanXYZ, velNED)
 
 		return variables
 
