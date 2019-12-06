@@ -10,25 +10,25 @@ import statistics as stat
 
 def main():
 
-	
+
 	#Multirover Test
-	testtitle = 'One Base'# Two Rovers'
-	filenames = ['rover1.bag', 'rover2.bag']
-	bagtitles = ['Rover 1', 'Rover 2']
+	testtitle = 'One Base Two Rovers'
+	filenames = ['alldata.bag']
+	bagtitles = ['Data']
 	names = ['rover', 'rover2']
 
 	multiroverbags = []
 
 	for filename in filenames:
-		multiroverbags.append(rosbag.Bag('/home/matt/data/devel/tworover/' + filename))
+		multiroverbags.append(rosbag.Bag('~/rtk_tests/tworoveronecomp/' + filename))
 
 	#Execute function to plot data from rosbags
 
 	multirotor_stdev = parserplot(testtitle, multiroverbags, bagtitles, names)
 
-	testtitle = 'Stationary Base and Rover'
-	filenames = ['rover_northsouth.bag', 'rover_eastwest.bag', 'rover_diagonal.bag']
-	bagtitles = ['Stationary Base Rover Test 1','Stationary Base Rover Test 2', 'Stationary Base Rover Test 3']
+	# testtitle = 'Stationary Base and Rover'
+	# filenames = ['rover_northsouth.bag', 'rover_eastwest.bag', 'rover_diagonal.bag']
+	# bagtitles = ['Stationary Base Rover Test 1','Stationary Base Rover Test 2', 'Stationary Base Rover Test 3']
 
 	#stationary_base_roverbags = []
 
@@ -57,9 +57,11 @@ def parserplot(testtitle, rosbags, bagtitles, names):
 	stddevveleast = 0
 	stddevvelup = 0
 
+	bag = rosbags[0];
+
 	index = 0
 	#Create a for loop to go through all bags
-	for bag in rosbags:
+	for name in names:
 
 		#Get title of bag
 		bagtitle = bagtitles[index]
@@ -97,7 +99,7 @@ def parserplot(testtitle, rosbags, bagtitles, names):
 				time.append(timestamp)
 		#print(north)
 
-			
+
 
 		#Create blank arrays for velNED
 		#print(time)
@@ -113,7 +115,7 @@ def parserplot(testtitle, rosbags, bagtitles, names):
 		for i in range(0, len(temp)):
 
 			timestamp = ((variables.minute[i] - variables.minute[0])*60 +
-				(variables.sec[i] - startsec) + 
+				(variables.sec[i] - startsec) +
 			    (variables.nano[i]-variables.nano[0])*10**(-9))
 			if timestamp < 0:
 				pass
@@ -137,7 +139,7 @@ def parserplot(testtitle, rosbags, bagtitles, names):
 		figurenorth.suptitle(bagtitle + ' North Position')
 		plt.xlabel('Time (sec)')
 		plt.ylabel('North (m)')
-		plt.axis([0, time[len(time)-1], stat.mean(north)-2*stat.stdev(north), 
+		plt.axis([0, time[len(time)-1], stat.mean(north)-2*stat.stdev(north),
 			stat.mean(north)+2*stat.stdev(north)])
 		plt.scatter(time, north, 1, label = 'Data')
 		plt.plot(time, [stat.mean(north)]*len(time), 'r--', label = 'Mean Average: %.3f meters' %stat.mean(north))
@@ -150,7 +152,7 @@ def parserplot(testtitle, rosbags, bagtitles, names):
 		figureeast.suptitle(bagtitle + ' East Position')
 		plt.xlabel('Time (sec)')
 		plt.ylabel('East (m)')
-		plt.axis([0, time[len(time)-1], stat.mean(east)-2*stat.stdev(east), 
+		plt.axis([0, time[len(time)-1], stat.mean(east)-2*stat.stdev(east),
 			stat.mean(east)+2*stat.stdev(east)])
 		plt.scatter(time, east, 1, label = 'Data')
 		plt.plot(time, [stat.mean(east)]*len(time), 'r--', label = 'Mean Average: %.3f meters' %stat.mean(east))
@@ -163,7 +165,7 @@ def parserplot(testtitle, rosbags, bagtitles, names):
 		figureup.suptitle(bagtitle + ' Vertical Position')
 		plt.xlabel('Time (sec)')
 		plt.ylabel('Up')
-		plt.axis([0, time[len(time)-1], stat.mean(up)-2*stat.stdev(up), 
+		plt.axis([0, time[len(time)-1], stat.mean(up)-2*stat.stdev(up),
 			stat.mean(up)+2*stat.stdev(up)])
 		plt.scatter(time, up, 1, label = 'Data')
 		plt.plot(time, [stat.mean(up)]*len(time), 'r--', label = 'Mean Average: %.3f meters' %stat.mean(up))
@@ -176,7 +178,7 @@ def parserplot(testtitle, rosbags, bagtitles, names):
 		figurevelnorth.suptitle(bagtitle + ' North Velocity')
 		plt.xlabel('Time (sec)')
 		plt.ylabel('North Velocity (m/s)')
-		plt.axis([0, veltime[len(veltime)-1], stat.mean(velnorth)-2*stat.stdev(velnorth), 
+		plt.axis([0, veltime[len(veltime)-1], stat.mean(velnorth)-2*stat.stdev(velnorth),
 			stat.mean(velnorth)+2*stat.stdev(velnorth)])
 		plt.scatter(veltime, velnorth, 1, label = 'Data')
 		plt.plot(veltime, [stat.mean(velnorth)]*len(veltime), 'r--', label = 'Mean Average: %.3f m/s' %stat.mean(velnorth))
@@ -189,7 +191,7 @@ def parserplot(testtitle, rosbags, bagtitles, names):
 		figureveleast.suptitle(bagtitle + ' East Velocity')
 		plt.xlabel('Time (sec)')
 		plt.ylabel('East Velocity (m/s)')
-		plt.axis([0, veltime[len(veltime)-1], stat.mean(veleast)-2*stat.stdev(veleast), 
+		plt.axis([0, veltime[len(veltime)-1], stat.mean(veleast)-2*stat.stdev(veleast),
 			stat.mean(veleast)+2*stat.stdev(veleast)])
 		plt.scatter(veltime, veleast, 1, label = 'Data')
 		plt.plot(veltime, [stat.mean(veleast)]*len(veltime), 'r--', label = 'Mean Average: %.3f m/s' %stat.mean(veleast))
@@ -202,7 +204,7 @@ def parserplot(testtitle, rosbags, bagtitles, names):
 		figurevelup.suptitle(bagtitle + ' Vertical Velocity')
 		plt.xlabel('Time (sec)')
 		plt.ylabel('Vertical Velocity (m/s)')
-		plt.axis([0, veltime[len(veltime)-1], stat.mean(velup)-2*stat.stdev(velup), 
+		plt.axis([0, veltime[len(veltime)-1], stat.mean(velup)-2*stat.stdev(velup),
 			stat.mean(velup)+2*stat.stdev(velup)])
 		plt.scatter(veltime, velup, 1, label = 'Data')
 		plt.plot(veltime, [stat.mean(velup)]*len(veltime), 'r--', label = 'Mean Average: %.3f m/s' %stat.mean(velup))
@@ -220,7 +222,7 @@ def parserplot(testtitle, rosbags, bagtitles, names):
 		stddevveleast = stddevveleast + stat.stdev(veleast)
 		stddevvelup = stddevvelup + stat.stdev(velup)
 
-		figures.extend([figureflags, figurenorth, figureeast, figureup, figurevelnorth, 
+		figures.extend([figureflags, figurenorth, figureeast, figureup, figurevelnorth,
 	          figureveleast, figurevelup])
 
 	#Cycle through all the rosbags to get all the data.
@@ -232,7 +234,7 @@ def parserplot(testtitle, rosbags, bagtitles, names):
 	stddevvelnorth = stddevvelnorth/index
 	stddevveleast = stddevveleast/index
 	stddevvelup = stddevvelup/index
-	
+
 	return [stddevnorth, stddeveast, stddevup, stddevvelnorth, stddevveleast, stddevvelup]
 
 
