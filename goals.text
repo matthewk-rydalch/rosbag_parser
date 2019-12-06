@@ -1,14 +1,5 @@
-Plot a horizontal line at each point for altitude.
+Plot a 3D graph/simulation
 
-plot of data points
+Plot a 2D graph
 
-1: .27 m
-2: 1.27m
-3: 1.95m
-
-
-
-For stationary
-standard deviation
-mean
-plot of data points
+Need to write all graphs to the directory where the bag is.
