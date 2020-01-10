@@ -13,8 +13,8 @@ def main():
 
 	#Multirover Test
 	testtitle = 'Multiple Rovers'
-	filenames = ['alldata.bag']
-	path = '/home/magicc/rtk_tests/tworoveronecomp/'
+	filenames = ['fourthtest.bag']
+	path = '/home/magicc/rtk_tests/chain/fourthtest/'
 	bagtitles = ['Data']
 	names = ['base', 'rover', 'rover2']
 
@@ -227,6 +227,14 @@ def parserplot(testtitle, rosbags, bagtitles, names, path):
 		plt.plot(time, [stat.mean(relposheading)+stat.stdev(relposheading)]*len(time), 'g--')
 		plt.legend()
 		plt.savefig(path+name+'relposheading.png')
+
+		figureNE = plt.figure()
+		figureNE.suptitle(name + ' North East Position')
+		plt.xlabel('East (m)')
+		plt.ylabel('North (m)')
+		plt.axis([min(east), max(east), min(north), max(north)])
+		plt.scatter(east, north, 1, label = 'Position')
+		plt.savefig(path+name+'northeastpos.png')
 
 		#print(index)
 		index = index + 1
