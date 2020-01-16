@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+
+<data>
+	<file> 
+		<name>fourthtest.bag</name>
+		<path>/home/magicc/rtk_tests/chain/fourthtest/</path>
+		<plot title="RelPosNED">ex`
+			<x-axis>
+				<topic>/rover/RelPos</topic>
+				<section>relPosN</section>
+			</x-axis>
+			<y-axis>
+				<topic>/rover/RelPos</topic>
+				<section>relPosE</section>
+			</y-axis>
+			<z-axis>
+				<topic>/rover/RelPos</topic>
+				<section>relPosD</section>
+			</z-axis>
+		</plot>
+	</file>
+
+	<file>
+		<name>fourthtest.bag</name>
+		<path>/home/magicc/rtk_tests/chain/fourthtest/</path>
+		<plot title="RelPosN">
+			<x-axis>
+				<topic>/rover/RelPos</topic>
+				<section>time</section>
+			</x-axis>
+			<y-axis>
+				<topic>/rover/RelPos</topic>
+				<section>relPosN</section>
+			</y-axis>
+		</plot>
+	</file>
+</data>
