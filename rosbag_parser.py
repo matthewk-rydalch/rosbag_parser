@@ -11,12 +11,12 @@ import statistics as stat
 def main():
 
 
-	#Multirover Test
-	testtitle = 'Multiple Rovers'
-	filenames = ['fourthtest.bag']
-	path = '/home/magicc/rtk_tests/chain/fourthtest/'
+	#Test
+	testtitle = 'Arrow'
+	filenames = ['NEU2.bag']
+	path = '/home/magicc/rtk_tests/arrow/'
 	bagtitles = ['Data']
-	names = ['base', 'rover', 'rover2']
+	names = ['base', 'rover']
 
 	multiroverbags = []
 
@@ -219,8 +219,8 @@ def parserplot(testtitle, rosbags, bagtitles, names, path):
 		figurerelposheading.suptitle(name + ' Relative Position Heading')
 		plt.xlabel('Time (sec)')
 		plt.ylabel('Heading (Radians)')
-		plt.axis([0, time[len(time)-1], stat.mean(relposheading)-2*stat.stdev(relposheading),
-			stat.mean(relposheading)+2*stat.stdev(relposheading)])
+		#plt.axis([0, time[len(time)-1], stat.mean(relposheading)-2*stat.stdev(relposheading),
+			#stat.mean(relposheading)+2*stat.stdev(relposheading)])
 		plt.scatter(time, relposheading, 1, label = 'Data')
 		plt.plot(time, [stat.mean(relposheading)]*len(time), 'r--', label = 'Mean Average: %.3f rad' %stat.mean(relposheading))
 		plt.plot(time, [stat.mean(relposheading)-stat.stdev(relposheading)]*len(time), 'g--', label = 'Standard Deviation: %.3f rad' %stat.stdev(relposheading))

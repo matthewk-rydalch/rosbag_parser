@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+
+<data>
+    <file>
+        <name>NEU2.bag</name>
+        <path>/home/magicc/rtk_tests/arrow/</path>
+        <figure>
+            <scatter>
+                <x-axis>
+                    <topic>/rover/RelPos</topic>
+                    <section>time</section>
+                </x-axis>
+                <y-axis>
+                    <topic>/rover/RelPos</topic>
+                    <section>Yaw</section>
+                </y-axis>
+            </scatter>
+        </figure>
+        <figure>
+            <scatter>
+                <x-axis>
+                    <topic>/rover/RelPos</topic>
+                    <section>time</section>
+                </x-axis>
+                <y-axis>
+                    <topic>/rover/RelPos</topic>
+                    <section>relPosHeading</section>
+                </y-axis>
+            </scatter>
+        </figure>
+        <figure>
+            <scatter>
+                <x-axis>
+                    <topic>/rover/RelPos</topic>
+                    <section>time</section>
+                </x-axis>
+                <y-axis>
+                    <topic>/rover/RelPos</topic>
+                    <section>relPosLength</section>
+                </y-axis>
+            </scatter>
+        </figure>
+        <figure title="Arrow Length">
+            <scatter>
+                <x-axis>
+                    <topic>/rover/RelPos</topic>
+                    <section>time</section>
+                </x-axis>
+                <y-axis>
+                    <topic>/rover/RelPos</topic>
+                    <section>arrowLength</section>
+                </y-axis>
+            </scatter>
+        </figure>
+        <figure title="Arrow Pitch">
+            <scatter>
+                <x-axis>
+                    <topic>/rover/RelPos</topic>
+                    <section>time</section>
+                </x-axis>
+                <y-axis>
+                    <topic>/rover/RelPos</topic>
+                    <section>Pitch</section>
+                </y-axis>
+            </scatter>
+        </figure>
+        <figure title="Rover NED">
+            <scatter>
+                <x-axis>
+                    <topic>/rover/RelPos</topic>
+                    <section>relPosN</section>
+                </x-axis>
+                <y-axis>
+                    <topic>/rover/RelPos</topic>
+                    <section>relPosE</section>
+                </y-axis>
+                <z-axis>
+                    <topic>/rover/RelPos</topic>
+                    <section>relPosD</section>
+                </z-axis>
+            </scatter>
+        </figure>
+    </file>
+
+</data>

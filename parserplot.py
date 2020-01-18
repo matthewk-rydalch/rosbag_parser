@@ -23,47 +23,51 @@ def parseXML(tree):
         fileitr = file.iter()
 
         for element in fileitr:
-            if element.tag =='plot':
+            if element.tag =='figure' or element.tag == 'plot':
                 rosplot(bag, element)
 
-def rosplot(bag, element):
+def rosplot(bag, plot):
 
     variables = []
     axistitles = []
-    title = element.get('title')
+    title = plot.get('title')
 
-    for axis in element:
-        variables.append(get_variables(bag, axis.findtext('topic'), axis.findtext('section')))
-        axistitles.append(axis.findtext('topic')+"/"+axis.findtext('section'))
+    for plot_type in plot:
 
-    if(len(variables)==2):
-        #print("2D")
-        plot_2d(variables, axistitles, title)
+        for axis in plot_type:
+            variables.append(get_variables(bag, axis.findtext('topic'), axis.findtext('section')))
+            axistitles.append(axis.findtext('topic')+"/"+axis.findtext('section'))
 
-    elif(len(variables)==3):
-        #print("3D")
-        plot_3d(variables, axistitles, title)
-    else:
-        print("Error: Too many axis")
+        if(len(variables)==2):
+            #print("2D")
+            plot_2d(variables, axistitles, title, plot_type.tag)
+
+        elif(len(variables)==3):
+            #print("3D")
+            plot_3d(variables, axistitles, title, plot_type.tag)
+        else:
+            print("Error: Too many axis")
 
 #470 tanner 3:30
 
-def plot_3d(variables, axistitles, title):
+def plot_3d(variables, axistitles, title, plot_type = 'scatter'):
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
     ax.set_xlabel(axistitles[0])
     ax.set_ylabel(axistitles[1])
     ax.set_zlabel(axistitles[2])
     ax.set_title(title)
-    ax.scatter(variables[0], variables[1], variables[2])
+    eval('ax.'+plot_type+"(variables[0], variables[1], variables[2])")
     plt.show()
 
-def plot_2d(variables, axistitles = ['Axis 1', 'Axis 2'], title = 'No Title'):
-    fig = plt.figure()
+def plot_2d(variables, axistitles = ['Axis 1', 'Axis 2'], title = 'No Title', plot_type = 'scatter'):
     plt.xlabel(axistitles[0])
     plt.ylabel(axistitles[1])
     plt.suptitle(title)
-    plt.scatter(variables[0], variables[1])
+    plt.plot(variables[0], variables[1])
+    #eval('plt.'+plot_type+'(variables[0], variables[1])')
+    #for x in variables[0]:
+    #    print(x)
     plt.show()
 
 def get_variables(bag, topic, section):
@@ -85,6 +89,10 @@ def get_section(msg, section, t=0):
         return msg.relPosNED[2]
     elif section == 'time' or section == 'rosbagtime':
         return [t.secs, t.nsecs]
+    elif section == 'Yaw':
+        return msg.arrowRPY[2]
+    elif section == 'Pitch':
+        return msg.arrowRPY[1]
     else:
         return eval("msg."+section)
 

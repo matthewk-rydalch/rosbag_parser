@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<data>
+    <figure title="This is a Figure">
+        <axes type="3d">
+            <scatter color="b" marker=".">
+                <x-data>
+                    <bag>fourthtest.bag</bag>
+		            <path>/home/magicc/rtk_tests/chain/fourthtest/</path>
+                    <topic>/rover/RelPos</topic>
+                    <section>relPosN</section>
+                </x-data>
+                <y-data>
+                    <bag>fourthtest.bag</bag>
+		            <path>/home/magicc/rtk_tests/chain/fourthtest/</path>
+                    <topic>/rover/RelPos</topic>
+                    <section>relPosE</section>
+                </y-data>
+                <z-data>
+                    <bag>fourthtest.bag</bag>
+		            <path>/home/magicc/rtk_tests/chain/fourthtest/</path>
+                    <topic>/rover/RelPos</topic>
+                    <section>relPosD</section>
+                </z-data>
+            </scatter>
+            
+        </axes>
+    </figure>
+
+</data>

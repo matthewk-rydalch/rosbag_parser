@@ -4,19 +4,21 @@
 	<file> 
 		<name>fourthtest.bag</name>
 		<path>/home/magicc/rtk_tests/chain/fourthtest/</path>
-		<plot title="RelPosNED">ex`
-			<x-axis>
-				<topic>/rover/RelPos</topic>
-				<section>relPosN</section>
-			</x-axis>
-			<y-axis>
-				<topic>/rover/RelPos</topic>
-				<section>relPosE</section>
-			</y-axis>
-			<z-axis>
-				<topic>/rover/RelPos</topic>
-				<section>relPosD</section>
-			</z-axis>
+		<plot title="RelPosNED">
+			<scatter color='r'>
+				<x-axis>
+					<topic>/rover/RelPos</topic>
+					<section>relPosN</section>
+				</x-axis>
+				<y-axis>
+					<topic>/rover/RelPos</topic>
+					<section>relPosE</section>
+				</y-axis>
+				<z-axis>
+					<topic>/rover/RelPos</topic>
+					<section>relPosD</section>
+				</z-axis>
+			</scatter>
 		</plot>
 	</file>
 
@@ -24,14 +26,16 @@
 		<name>fourthtest.bag</name>
 		<path>/home/magicc/rtk_tests/chain/fourthtest/</path>
 		<plot title="RelPosN">
-			<x-axis>
-				<topic>/rover/RelPos</topic>
-				<section>time</section>
-			</x-axis>
-			<y-axis>
-				<topic>/rover/RelPos</topic>
-				<section>relPosN</section>
-			</y-axis>
+			<scatter>
+				<x-axis>
+					<topic>/rover/RelPos</topic>
+					<section>time</section>
+				</x-axis>
+				<y-axis>
+					<topic>/rover/RelPos</topic>
+					<section>relPosN</section>
+				</y-axis>
+			</scatter>
 		</plot>
 	</file>
 </data>
