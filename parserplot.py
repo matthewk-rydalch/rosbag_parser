@@ -16,7 +16,15 @@ def loadXML(filename='params/secondtest.xml'):
     return tree
 
 def parseXML(tree):
-    files = tree.iter('file')
+    for figure in tree:
+        fig = plt.figure()
+        for axes in figure:
+            if axes.get('type') == "3d":
+                ax = fig.add_subplot(projection='3d')
+                for plot_type in axes:
+                    rosplot(ax ,plot_type)
+            elif axis.get('type') == '2d':
+                ax=fig.add_subplot()
 
     for file in files:
         bag = rosbag.Bag(file.findtext('path')+file.findtext('name'))
