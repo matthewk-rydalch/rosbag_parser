@@ -2,6 +2,7 @@ from IPython.core.debugger import set_trace
 from importlib import reload
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+from collections import namedtuple
 import sys
 import rosbag
 import numpy as np
@@ -9,13 +10,42 @@ import xml.etree.ElementTree as ET
 
 def main():
     tree = loadXML(sys.argv[1])  #Load from the XML file and return a tree
-    parseXML(tree)
+    struct = parseXML(tree)
+
+    path="/home/magicc/rtk_tests/arrow/"
+    name="NEU2.bag"
+
+    arrow(path+name)
+
+#plots an arrow on the figure
+def arrow(baglocation):
+    bag = rosbag.Bag(baglocation)
+    
+    #Get arrowlength array
+    arrowLength = get_variables(bag, "/base/RelPos", "arrowLength")
+    #Get arrowRPY and extract P and Y
+    arrowRPY = get_variables(bag, "/base/RelPos", "arrowRPY")
+    #Get arrowNED
+    arrowNED = get_variables(bag, "/base/RelPos", "arrowNED")
+    relPosNED = []
+    #Get RelPosNED
+    relPosNED = get_variables(bag, "/base/RelPos", "relPosNED")
+    #Create a new 3d plot
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.quiver(relPosNED[0], relPosNED[1], relPosNED[2], arrowNED[0], arrowNED[1], arrowNED[2])
+
+    #Do quiver(arrowbaseNED[0], arrowbaseNED[1], arrowbaseNED[2], arrowN, arrowE, arrowD)
+    #Also do a quiver with arrowlength and P Y
+
 
 def loadXML(filename='params/secondtest.xml'):
     tree = ET.parse(filename)
     return tree
 
 def parseXML(tree):
+    figures = []
+    variables = []
     #Get the root of the tree
     root = tree.getroot()
     for figure in root:
@@ -25,13 +55,16 @@ def parseXML(tree):
         for axes in figure:
             if axes.get('type') == "3d":
                 ax = fig.add_subplot(projection='3d')
-                for plot_type in axes:  #Axes types may be scatter or line
-                    rosplot(ax ,plot_type)
             elif axes.get('type') == '2d':
                 ax=fig.add_subplot()
-                for plot_type in axes:  #Axes types may be scatter or line
-                    rosplot(ax ,plot_type)
+            for plot_type in axes:  #Axes types may be scatter or line
+                variables.append(rosplot(ax ,plot_type))
             ax.set_title(axes.get('title'))
+        figures.append(fig)
+    
+    mystruct = namedtuple("mystruct", "figure, variable")
+    returning = mystruct(figures, variables)
+    return returning
 
 def rosplot(ax, plot_type):
 
@@ -59,6 +92,8 @@ def rosplot(ax, plot_type):
         plot_3d(variables, axistitles, ax, plot_type.tag, plot_type.get('color'), plot_type.get('marker'))
     else:
         print("Error: Too many axis")
+    
+    return variables
 
 #470 tanner 3:30
 
