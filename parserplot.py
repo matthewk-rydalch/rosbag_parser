@@ -16,63 +16,65 @@ def loadXML(filename='params/secondtest.xml'):
     return tree
 
 def parseXML(tree):
-    for figure in tree:
+    #Get the root of the tree
+    root = tree.getroot()
+    for figure in root:
+        print("Figure\n")
         fig = plt.figure()
+        print(figure.get('title'))
         for axes in figure:
             if axes.get('type') == "3d":
                 ax = fig.add_subplot(projection='3d')
-                for plot_type in axes:
+                for plot_type in axes:  #Axes types may be scatter or line
                     rosplot(ax ,plot_type)
-            elif axis.get('type') == '2d':
+            elif axes.get('type') == '2d':
                 ax=fig.add_subplot()
+                for plot_type in axes:  #Axes types may be scatter or line
+                    rosplot(ax ,plot_type)
+            ax.set_title(axes.get('title'))
 
-    for file in files:
-        bag = rosbag.Bag(file.findtext('path')+file.findtext('name'))
-        fileitr = file.iter()
-
-        for element in fileitr:
-            if element.tag =='figure' or element.tag == 'plot':
-                rosplot(bag, element)
-
-def rosplot(bag, plot):
+def rosplot(ax, plot_type):
 
     variables = []
     axistitles = []
-    title = plot.get('title')
 
-    for plot_type in plot:
+    #For each axis
+    for axis in plot_type:
 
-        for axis in plot_type:
-            variables.append(get_variables(bag, axis.findtext('topic'), axis.findtext('section')))
-            axistitles.append(axis.findtext('topic')+"/"+axis.findtext('section'))
+        print(axis.tag+"\n")
 
-        if(len(variables)==2):
-            #print("2D")
-            plot_2d(variables, axistitles, title, plot_type.tag)
+        #Create rosbag
+        bag = rosbag.Bag(axis.find('path').text+axis.find('bag').text)
 
-        elif(len(variables)==3):
-            #print("3D")
-            plot_3d(variables, axistitles, title, plot_type.tag)
-        else:
-            print("Error: Too many axis")
+        #For each axis we append variables and axistitles
+        variables.append(get_variables(bag, axis.findtext('topic'), axis.findtext('section')))
+        axistitles.append(axis.findtext('topic')+"/"+axis.findtext('section'))
+
+    if(len(variables)==2):
+        #print("2D")
+        plot_2d(variables, axistitles, ax, plot_type.tag, plot_type.get('color'), plot_type.get('marker'), plot_type.get('line'))
+
+    elif(len(variables)==3):
+        #print("3D")
+        plot_3d(variables, axistitles, ax, plot_type.tag, plot_type.get('color'), plot_type.get('marker'), plot_type.get('line'))
+    else:
+        print("Error: Too many axis")
 
 #470 tanner 3:30
 
-def plot_3d(variables, axistitles, title, plot_type = 'scatter'):
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
+def plot_3d(variables, axistitles, ax, plot_type = 'scatter', color='b', marker='.', line=''):
     ax.set_xlabel(axistitles[0])
     ax.set_ylabel(axistitles[1])
     ax.set_zlabel(axistitles[2])
-    ax.set_title(title)
+    ax.set_title("Test")
     eval('ax.'+plot_type+"(variables[0], variables[1], variables[2])")
     plt.show()
 
-def plot_2d(variables, axistitles = ['Axis 1', 'Axis 2'], title = 'No Title', plot_type = 'scatter'):
+def plot_2d(variables, axistitles = ['Axis 1', 'Axis 2'], title = 'No Title', plot_type = 'scatter', color='b', marker='.', line=''):
     plt.xlabel(axistitles[0])
     plt.ylabel(axistitles[1])
     plt.suptitle(title)
-    plt.plot(variables[0], variables[1])
+    plt.plot(variables[0], variables[1], color+marker+line)
     #eval('plt.'+plot_type+'(variables[0], variables[1])')
     #for x in variables[0]:
     #    print(x)

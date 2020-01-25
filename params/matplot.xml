@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <data>
     <figure title="This is a Figure">
-        <axes type="3d">
-            <scatter color="b" marker=".">
+        <axes type="3d" title="The Axes">
+            <scatter color="b" marker="." line="-">
                 <x-data>
                     <bag>fourthtest.bag</bag>
 		            <path>/home/magicc/rtk_tests/chain/fourthtest/</path>
@@ -22,7 +22,44 @@
                     <section>relPosD</section>
                 </z-data>
             </scatter>
+            <scatter color="r" marker="+" line="-">
+                <x-data>
+                    <bag>fourthtest.bag</bag>
+		            <path>/home/magicc/rtk_tests/chain/fourthtest/</path>
+                    <topic>/brover/RelPos</topic>
+                    <section>relPosN</section>
+                </x-data>
+                <y-data>
+                    <bag>fourthtest.bag</bag>
+		            <path>/home/magicc/rtk_tests/chain/fourthtest/</path>
+                    <topic>/brover/RelPos</topic>
+                    <section>relPosE</section>
+                </y-data>
+                <z-data>
+                    <bag>fourthtest.bag</bag>
+		            <path>/home/magicc/rtk_tests/chain/fourthtest/</path>
+                    <topic>/brover/RelPos</topic>
+                    <section>relPosD</section>
+                </z-data>
+            </scatter>
         </axes>
     </figure>
-
+    <figure title="North vs East">
+        <axes type="2d" title="2D Axes">
+            <scatter color="r" marker="+" line="">
+                <x-data>
+                    <bag>fourthtest.bag</bag>
+                    <path>/home/magicc/rtk_tests/chain/fourthtest/</path>
+                    <topic>/rover/RelPos</topic>
+                    <section>relPosN</section>
+                </x-data>
+                <y-data>
+                    <bag>fourthtest.bag</bag>
+                    <path>/home/magicc/rtk_tests/chain/fourthtest/</path>
+                    <topic>/rover/RelPos</topic>
+                    <section>relPosE</section>
+                </y-data>
+            </scatter>
+        </axes>
+    </figure>
 </data>
