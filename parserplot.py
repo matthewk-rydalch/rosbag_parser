@@ -56,18 +56,18 @@ def rosplot(ax, plot_type):
 
     elif(len(variables)==3):
         #print("3D")
-        plot_3d(variables, axistitles, ax, plot_type.tag, plot_type.get('color'), plot_type.get('marker'), plot_type.get('line'))
+        plot_3d(variables, axistitles, ax, plot_type.tag, plot_type.get('color'), plot_type.get('marker'))
     else:
         print("Error: Too many axis")
 
 #470 tanner 3:30
 
-def plot_3d(variables, axistitles, ax, plot_type = 'scatter', color='b', marker='.', line=''):
+def plot_3d(variables, axistitles, ax, plot_type = 'scatter', color='b', m='.', line=''):
     ax.set_xlabel(axistitles[0])
     ax.set_ylabel(axistitles[1])
     ax.set_zlabel(axistitles[2])
     ax.set_title("Test")
-    eval('ax.'+plot_type+"(variables[0], variables[1], variables[2])")
+    eval('ax.'+plot_type+"(variables[0], variables[1], variables[2], c=color, marker=m)")
     plt.show()
 
 def plot_2d(variables, axistitles = ['Axis 1', 'Axis 2'], title = 'No Title', plot_type = 'scatter', color='b', marker='.', line=''):
