@@ -15,7 +15,7 @@ def main():
     path="/home/magicc/rtk_tests/arrow/"
     name="NEU2.bag"
 
-    arrow(path+name)
+    #arrow(path+name)
 
 #plots an arrow on the figure
 def arrow(baglocation):
@@ -56,7 +56,7 @@ def parseXML(tree):
             if axes.get('type') == "3d":
                 ax = fig.add_subplot(projection='3d')
             elif axes.get('type') == '2d':
-                ax=fig.add_subplot()
+                ax=fig.add_subplot(title=axes.get('title'))
             for plot_type in axes:  #Axes types may be scatter or line
                 variables.append(rosplot(ax ,plot_type))
             ax.set_title(axes.get('title'))
@@ -81,7 +81,10 @@ def rosplot(ax, plot_type):
 
         #For each axis we append variables and axistitles
         variables.append(get_variables(bag, axis.findtext('topic'), axis.findtext('section')))
-        axistitles.append(axis.findtext('topic')+"/"+axis.findtext('section'))
+        if(axis.get('title')==None):
+            axistitles.append(axis.findtext('topic')+"/"+axis.findtext('section'))
+        else:
+            axistitles.append(axis.get('title'))
 
     if(len(variables)==2):
         #print("2D")
@@ -108,7 +111,7 @@ def plot_3d(variables, axistitles, ax, plot_type = 'scatter', color='b', m='.', 
 def plot_2d(variables, axistitles = ['Axis 1', 'Axis 2'], title = 'No Title', plot_type = 'scatter', color='b', marker='.', line=''):
     plt.xlabel(axistitles[0])
     plt.ylabel(axistitles[1])
-    plt.suptitle(title)
+    #plt.suptitle(title)
     plt.plot(variables[0], variables[1], color+marker+line)
     #eval('plt.'+plot_type+'(variables[0], variables[1])')
     #for x in variables[0]:
@@ -138,6 +141,8 @@ def get_section(msg, section, t=0):
         return msg.arrowRPY[2]
     elif section == 'Pitch':
         return msg.arrowRPY[1]
+    elif section == 'posN' :
+        return msg.position[0]
     else:
         return eval("msg."+section)
 
