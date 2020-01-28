@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+<data>
+    <figure>
+        <axes type="2d" title="Mocap and Virtual RTK Simulated Values">
+            <scatter color="b" marker="+" line="">
+                <axis title="Time (s)">
+                    <path>/home/magicc/data/mocap/</path>
+                    <bag>vertnoise.bag</bag>
+                    <topic>/virt_RTK</topic>
+                    <section>time</section>
+                </axis>
+                <axis title="North Direction (m)">
+                    <path>/home/magicc/data/mocap/</path>
+                    <bag>vertnoise.bag</bag>
+                    <topic>/virt_RTK</topic>
+                    <section>relPosN</section>
+                </axis>
+            </scatter>
+            <scatter color="r" marker="." line="">
+                <axis title="time">
+                    <path>/home/magicc/data/mocap/</path>
+                    <bag>groot.bag</bag>
+                    <topic>/RigidBody_004_ned</topic>
+                    <section>time</section>
+                </axis>
+                <axis title="North Direction">
+                    <path>/home/magicc/data/mocap/</path>
+                    <bag>groot.bag</bag>
+                    <topic>/RigidBody_004_ned</topic>
+                    <section>pose.position.x</section>
+                </axis>
+            </scatter>
+        </axes>
+    </figure>
+    <figure>
+        <axes type="3d">
+            <scatter color="r" marker="." line="">
+                <axis>
+                    <path>/home/magicc/data/mocap/</path>
+                    <bag>groot.bag</bag>
+                    <topic>/RigidBody_004_ned</topic>
+                    <section>pose.position.x</section>
+                </axis>
+                <axis>
+                    <path>/home/magicc/data/mocap/</path>
+                    <bag>groot.bag</bag>
+                    <topic>/RigidBody_004_ned</topic>
+                    <section>pose.position.y</section>
+                </axis>
+                <axis>
+                    <path>/home/magicc/data/mocap/</path>
+                    <bag>groot.bag</bag>
+                    <topic>/RigidBody_004_ned</topic>
+                    <section>pose.position.z</section>
+                </axis>
+            </scatter>
+            <scatter color="b" marker="+" line="">
+                <axis>
+                    <path>/home/magicc/data/mocap/</path>
+                    <bag>vertnoise.bag</bag>
+                    <topic>/virt_RTK</topic>
+                    <section>relPosN</section>
+                </axis>
+                <axis>
+                    <path>/home/magicc/data/mocap/</path>
+                    <bag>vertnoise.bag</bag>
+                    <topic>/virt_RTK</topic>
+                    <section>relPosE</section>
+                </axis>
+                <axis>
+                    <path>/home/magicc/data/mocap/</path>
+                    <bag>vertnoise.bag</bag>
+                    <topic>/virt_RTK</topic>
+                    <section>relPosD</section>
+                </axis>
+            </scatter>
+        </axes>
+    </figure>
+</data>
