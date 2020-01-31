@@ -3,6 +3,7 @@ from importlib import reload
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from collections import namedtuple
+import matplotlib.animation as animation
 import sys
 import rosbag
 import numpy as np
@@ -12,10 +13,42 @@ def main():
     tree = loadXML(sys.argv[1])  #Load from the XML file and return a tree
     struct = parseXML(tree)
 
-    path="/home/magicc/rtk_tests/arrow/"
-    name="NEU2.bag"
+    print(len(struct.variable))
+
+    # ani = animate(struct.variable[0])
 
     #arrow(path+name)
+
+def init():
+    print("Init Function Called")
+
+def updateNED(relPosNED, *fargs):
+    "Called updateNED function"
+    ax = fargs[1]
+    # print(relPosNED)
+    ax.scatter(relPosNED[0], relPosNED[1], relPosNED[2], 'b.')
+
+
+#Animate
+def animate(variables):
+    print("Called Animate Function")
+    truevariables = rearrange(variables)
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    print(truevariables[0])
+    ani = animation.FuncAnimation(fig, updateNED, frames=truevariables, init_func=init, fargs = (fig, ax) , blit=False )
+    plt.show()
+    set_trace()
+    return ani
+
+def rearrange(variables):
+    truevariables = []
+    for i in range(len(variables[0])):
+        truevariables.append([variables[0][i], variables[1][i], variables[2][i]])
+    print(truevariables)
+    #set_trace()
+    return truevariables
+
 
 #plots an arrow on the figure
 def arrow(baglocation):
@@ -63,6 +96,7 @@ def parseXML(tree):
         figures.append(fig)
     
     mystruct = namedtuple("mystruct", "figure, variable")
+    # print(variables)
     returning = mystruct(figures, variables)
     return returning
 
@@ -95,7 +129,9 @@ def rosplot(ax, plot_type):
         plot_3d(variables, axistitles, ax, plot_type.tag, plot_type.get('color'), plot_type.get('marker'))
     else:
         print("Error: Too many axis")
-    
+    print("Rosplot variables: ")
+    # print(variables)
+    #set_trace()
     return variables
 
 #470 tanner 3:30
@@ -125,6 +161,9 @@ def get_variables(bag, topic, section):
     #Normalize Time
     if section=='time':
         variable = normalizeTime(variable)
+    print("get_variables variables")
+    # print(variable)
+    #set_trace()
     return variable
 
         

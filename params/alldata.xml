@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<data>
+    <figure title="Rover North Position vs Time">
+        <axes type="2d" title="Rover North Position vs Time">
+            <scatter color="b" marker="." line="">
+                <axis title="Time (sec)">
+                    <path>/home/magicc/rtk_tests/tworoveronecomp/</path>
+                    <bag>alldata.bag</bag>
+                    <topic>/rover/RelPos</topic>
+                    <section>time</section>
+                </axis>
+                <axis>
+                    <path>/home/magicc/rtk_tests/tworoveronecomp/</path>
+                    <bag>alldata.bag</bag>
+                    <topic>/rover/RelPos</topic>
+                    <section>relPosN</section>
+                </axis>
+            </scatter>
+        </axes>
+    </figure>
+    <figure title="Rover East Position vs Time">
+        <axes type="2d" title="Rover East Position vs Time">
+            <scatter color="b" marker="." line="">
+                <axis title="Time (sec)">
+                    <path>/home/magicc/rtk_tests/tworoveronecomp/</path>
+                    <bag>alldata.bag</bag>
+                    <topic>/rover/RelPos</topic>
+                    <section>time</section>
+                </axis>
+                <axis>
+                    <path>/home/magicc/rtk_tests/tworoveronecomp/</path>
+                    <bag>alldata.bag</bag>
+                    <topic>/rover/RelPos</topic>
+                    <section>relPosE</section>
+                </axis>
+            </scatter>
+        </axes>
+    </figure>
+</data>

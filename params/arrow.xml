@@ -1,85 +1,47 @@
 <?xml version="1.0"?>
-
 <data>
-    <file>
-        <name>NEU2.bag</name>
-        <path>/home/magicc/rtk_tests/arrow/</path>
-        <figure>
-            <scatter>
-                <x-axis>
-                    <topic>/rover/RelPos</topic>
-                    <section>time</section>
-                </x-axis>
-                <y-axis>
-                    <topic>/rover/RelPos</topic>
-                    <section>Yaw</section>
-                </y-axis>
-            </scatter>
-        </figure>
-        <figure>
-            <scatter>
-                <x-axis>
-                    <topic>/rover/RelPos</topic>
-                    <section>time</section>
-                </x-axis>
-                <y-axis>
-                    <topic>/rover/RelPos</topic>
-                    <section>relPosHeading</section>
-                </y-axis>
-            </scatter>
-        </figure>
-        <figure>
-            <scatter>
-                <x-axis>
-                    <topic>/rover/RelPos</topic>
-                    <section>time</section>
-                </x-axis>
-                <y-axis>
-                    <topic>/rover/RelPos</topic>
-                    <section>relPosLength</section>
-                </y-axis>
-            </scatter>
-        </figure>
-        <figure title="Arrow Length">
-            <scatter>
-                <x-axis>
-                    <topic>/rover/RelPos</topic>
-                    <section>time</section>
-                </x-axis>
-                <y-axis>
-                    <topic>/rover/RelPos</topic>
-                    <section>arrowLength</section>
-                </y-axis>
-            </scatter>
-        </figure>
-        <figure title="Arrow Pitch">
-            <scatter>
-                <x-axis>
-                    <topic>/rover/RelPos</topic>
-                    <section>time</section>
-                </x-axis>
-                <y-axis>
-                    <topic>/rover/RelPos</topic>
-                    <section>Pitch</section>
-                </y-axis>
-            </scatter>
-        </figure>
-        <figure title="Rover NED">
-            <scatter>
-                <x-axis>
+    <figure>
+        <axes type="3d">
+            <scatter color="b" marker="." line="">
+                <axis title="Multiple Rovers">
+                    <path>/home/magicc/rtk_tests/tworoveronecomp/</path>
+                    <bag>alldata.bag</bag>
                     <topic>/rover/RelPos</topic>
                     <section>relPosN</section>
-                </x-axis>
-                <y-axis>
+                </axis>
+                <axis>
+                    <path>/home/magicc/rtk_tests/tworoveronecomp/</path>
+                    <bag>alldata.bag</bag>
                     <topic>/rover/RelPos</topic>
                     <section>relPosE</section>
-                </y-axis>
-                <z-axis>
+                </axis>
+                <axis>
+                    <path>/home/magicc/rtk_tests/tworoveronecomp/</path>
+                    <bag>alldata.bag</bag>
                     <topic>/rover/RelPos</topic>
                     <section>relPosD</section>
-                </z-axis>
+                </axis>
             </scatter>
-        </figure>
-    </file>
-
+            <scatter color="g" marker="." line="">
+                <axis title="N">
+                    <path>/home/magicc/rtk_tests/tworoveronecomp/</path>
+                    <bag>alldata.bag</bag>
+                    <topic>/rover2/RelPos</topic>
+                    <section>relPosN</section>
+                </axis>
+                <axis title="E">
+                    <path>/home/magicc/rtk_tests/tworoveronecomp/</path>
+                    <bag>alldata.bag</bag>
+                    <topic>/rover2/RelPos</topic>
+                    <section>relPosE</section>
+                </axis>
+                <axis title = "D">
+                    <path>/home/magicc/rtk_tests/tworoveronecomp/</path>
+                    <bag>alldata.bag</bag>
+                    <topic>/rover2/RelPos</topic>
+                    <section>relPosD</section>
+                </axis>
+            </scatter>
+        </axes>
+    </figure>
 </data>

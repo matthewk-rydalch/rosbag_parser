@@ -55,19 +55,19 @@
                 </axis>
             </scatter>
             <scatter color="b" marker="+" line="">
-                <axis>
+                <axis title="N">
                     <path>/home/magicc/data/mocap/</path>
                     <bag>vertnoise.bag</bag>
                     <topic>/virt_RTK</topic>
                     <section>relPosN</section>
                 </axis>
-                <axis>
+                <axis title = "E">
                     <path>/home/magicc/data/mocap/</path>
                     <bag>vertnoise.bag</bag>
                     <topic>/virt_RTK</topic>
                     <section>relPosE</section>
                 </axis>
-                <axis>
+                <axis title = "D">
                     <path>/home/magicc/data/mocap/</path>
                     <bag>vertnoise.bag</bag>
                     <topic>/virt_RTK</topic>
