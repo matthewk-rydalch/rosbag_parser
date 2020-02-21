@@ -6,9 +6,8 @@ from collections import namedtuple
 
 def main():
 
-	filename = 'mob03.bag'
-	bag = rosbag.Bag('../../../data/08_22_walk/' + filename)
-	set_trace()
+	filename = 'rover_binary.bag'
+	bag = rosbag.Bag('../../../data/rtk_tests/altitude/' + filename)
 	# bag = rosbag.Bag(filename)
 	# foldername = 'redo_rod/one/'
 	# bag = rosbag.Bag('../../../data/' + foldername + 'data_fixed.bag')
@@ -45,14 +44,14 @@ class Parser:
 		# set_trace()
 		for topic, msg, t in bag.read_messages(topics=['/rover/RelPos']):
 			relPosNED.append(msg.relPosNED)
-			relPosNEDHP.append(msg.relPosHPNED)
+			# relPosNEDHP.append(msg.relPosHPNED)
 			relPosLength.append(msg.relPosLength)
-			relPosHPLength.append(msg.relPosHPLength)
+			# relPosHPLength.append(msg.relPosHPLength)
 			flags.append(msg.flags)
 			secs_rel.append(msg.header.stamp.secs)
 			nsecs_rel.append(msg.header.stamp.nsecs)
 
-		for topic, msg, t in bag.read_messages(topics=['/rover/PosVelTime']):
+		for topic, msg, t in bag.read_messages(topics=['/base/PosVelTime']):
 			secs_pos.append(msg.header.stamp.secs)
 			nsecs_pos.append(msg.header.stamp.nsecs)
 			lla.append(msg.lla)
@@ -80,12 +79,18 @@ class Parser:
 		# for topic, msg, t in bag.read_messages(topics=['/rover/GlonassEphemeris']):
 		# 	position.append(msg.position);
 
-		MyStruct = namedtuple("mystruct", "relPosNED, relPosNEDHP, relPosLength, relPosHPLength, \
-		flags, secs_rel, secs_pos, nsecs_pos, lla, year, month, day, hour, \
+		MyStruct = namedtuple("mystruct", "relPosNED, relPosLength, \
+		flags, sec_rel, nsec_rel, sec_pos, nsec_pos, lla, year, month, day, hour, \
 		minute, sec, nano, position, meanXYZ")
+		# MyStruct = namedtuple("mystruct", "relPosNED, relPosNEDHP, relPosLength, relPosHPLength, \
+		# flags, sec_rel, nsec_rel, sec_pos, nsec_pos, lla, year, month, day, hour, \
+		# minute, sec, nano, position, meanXYZ")
 
-		variables = MyStruct(relPosNED, relPosNEDHP, relPosLength, relPosHPLength, \
-		flags, secs_rel, secs_pos, nsecs_pos, lla, year, month, day, hour, \
+		# variables = MyStruct(relPosNED, relPosNEDHP, relPosLength, relPosHPLength, \
+		# flags, secs_rel, nsecs_rel, secs_pos, nsecs_pos, lla, year, month, day, hour, \
+		# minute, sec, nano, position, meanXYZ)
+		variables = MyStruct(relPosNED, relPosNED, relPosLength, relPosLength, \
+		flags, secs_rel, nsecs_rel, secs_pos, nsecs_pos, lla, year, month, day, hour, \
 		minute, sec, nano, position, meanXYZ)
 
 		return variables
