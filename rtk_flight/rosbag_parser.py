@@ -7,54 +7,25 @@ import numpy as np
 
 def main():
 
-	filename = 'land_2-19.bag'
-	bag = rosbag.Bag('../../data/mocap/' + filename)
+	filename = 'flight_2020-03-05-10-26-04.bag'
+	bag = rosbag.Bag('../../../data/' + filename)
 	data = Parser()
-	variables = data.get_variables(bag)
+	plt = data.get_boat_landing_platform_ned(bag)
 	bag.close()
-	return variables
+
+	MyStruct = namedtuple("mystruct", "plt")#, plt_virt, drone, hl_cmd, is_flying, is_landing, odom")
+	vals = MyStruct(plt)#, plt_virt, drone, hl_cmd, is_flying, is_landing, odom)
+
+	return vals
 
 class Parser:
-	def get_variables(self, bag):
-
+	def get_boat_landing_platform_ned(self, bag):
 		plt_sec = []
 		plt_nsec = []
 		plt_x = []
 		plt_y = []
 		plt_z = []
 		plt_orientation = []
-
-		plt_virt_sec = []
-		plt_virt_nsec = []
-		plt_virt_x = []
-		plt_virt_y = []
-		plt_virt_z = []
-		plt_virt_orientation = []
-
-		drone_sec = []
-		drone_nsec = []
-		drone_x = []
-		drone_y = []
-		drone_z = []
-		drone_orientation = []
-
-		hl_cmd_sec = []
-		hl_cmd_nsec = []
-		hl_cmd_x = []
-		hl_cmd_y = []
-		hl_cmd_z = []
-		hl_cmd_orientation = []
-
-		is_flying = []
-
-		is_landing = []
-
-		odom_sec = []
-		odom_nsec = []
-		odom_x = []
-		odom_y = []
-		odom_z = []
-		odom_orientation = []
 
 		for topic, msg, t in bag.read_messages(topics=['/boat_landing_platform_ned']): #this is the estimate
 			plt_sec.append(msg.header.stamp.secs)
@@ -66,6 +37,17 @@ class Parser:
 		
 		plt = pos_orient_time(plt_sec, plt_nsec, plt_x, plt_y, plt_z, plt_orientation)
 
+		return plt
+
+	def get_platform_virtual_odometry(self, bag):
+
+		plt_virt_sec = []
+		plt_virt_nsec = []
+		plt_virt_x = []
+		plt_virt_y = []
+		plt_virt_z = []
+		plt_virt_orientation = []
+
 		for topic, msg, t in bag.read_messages(topics=['/platform_virtual_odometry']): #this is the estimate
 			plt_virt_sec.append(msg.header.stamp.secs)
 			plt_virt_nsec.append(msg.header.stamp.nsecs)			
@@ -76,6 +58,15 @@ class Parser:
 		
 		plt_virt = pos_orient_time(plt_virt_sec, plt_virt_nsec, plt_virt_x, plt_virt_y, plt_virt_z, plt_virt_orientation)
 
+		return plt_virt
+
+	def get_ragnarok_ned(self, bag):
+		drone_sec = []
+		drone_nsec = []
+		drone_x = []
+		drone_y = []
+		drone_z = []
+		drone_orientation = []
 
 		for topic, msg, t in bag.read_messages(topics=['/ragnarok_ned']): #this is the estimate
 			drone_sec.append(msg.header.stamp.secs)
@@ -86,6 +77,16 @@ class Parser:
 			drone_orientation.append(msg.pose.orientation)
 		
 		drone = pos_orient_time(drone_sec, drone_nsec, drone_x, drone_y, drone_z, drone_orientation)
+	
+		return drone
+
+	def get_high_level_command(self, bag):
+		hl_cmd_sec = []
+		hl_cmd_nsec = []
+		hl_cmd_x = []
+		hl_cmd_y = []
+		hl_cmd_z = []
+		hl_cmd_orientation = []
 
 		for topic, msg, t in bag.read_messages(topics=['/high_level_command']): #this is the estimate
 			hl_cmd_sec.append(msg.header.stamp.secs)
@@ -97,11 +98,31 @@ class Parser:
 		
 		hl_cmd = pos_orient_time(hl_cmd_sec, hl_cmd_nsec, hl_cmd_x, hl_cmd_y, hl_cmd_z, hl_cmd_orientation)
 
+		return hl_cmd
+
+	def get_is_flying(self, bag):
+		is_flying = []
+
 		for topic, msg, t in bag.read_messages(topics=['/is_flying']): #this is the estimate
 			is_flying.append(msg.data)
 
+		return is_flying
+
+	def get_is_landing(self, bag):
+		is_landing = []
+
 		for topic, msg, t in bag.read_messages(topics=['/is_landing']): #this is the estimate
 			is_landing.append(msg.data)
+		
+		return is_landing
+
+	def get_odom(self, bag):
+		odom_sec = []
+		odom_nsec = []
+		odom_x = []
+		odom_y = []
+		odom_z = []
+		odom_orientation = []
 
 		for topic, msg, t in bag.read_messages(topics=['/odom']): #this is the estimate
 			odom_sec.append(msg.header.stamp.secs)
@@ -113,11 +134,7 @@ class Parser:
 		
 		odom = pos_orient_time(odom_sec, odom_nsec, odom_x, odom_y, odom_z, odom_orientation)
 
-		MyStruct = namedtuple("mystruct", "plt, plt_virt, drone, hl_cmd, is_flying, is_landing, odom")
-
-		variables = MyStruct(plt, plt_virt, drone, hl_cmd, is_flying, is_landing, odom)
-
-		return variables
+		return odom
 
 class pos_orient_time:
 	def __init__(self, sec, nsec, x, y, z, orientation):
@@ -127,4 +144,4 @@ class pos_orient_time:
 		self.orientation = orientation
 
 if __name__ == '__main__':
-    variables = main()
+    vals = main()
