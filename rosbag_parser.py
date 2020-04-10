@@ -12,11 +12,11 @@ def main():
 
 
 	#Test
-	testtitle = 'Arrow'
-	filenames = ['NEU2.bag']
-	path = '/home/magicc/rtk_tests/arrow/'
+	testtitle = 'GNSSvsRTK'
+	filenames = ['mar03_2020nomvtbag.bag']
+	path = '/home/magicc/rtk_tests/gnssvsrtk/mar03_2020nomvtbag/'
 	bagtitles = ['Data']
-	names = ['base', 'rover']
+	names = ['rover','base']
 
 	multiroverbags = []
 
@@ -45,7 +45,9 @@ def main():
 
 def parserplot(testtitle, rosbags, bagtitles, names, path):
 
-	data = Parser();
+	start_time = 5
+	
+	data = Parser()
 
 	figures = []
 
@@ -56,7 +58,7 @@ def parserplot(testtitle, rosbags, bagtitles, names, path):
 	stddevveleast = 0
 	stddevvelup = 0
 
-	bag = rosbags[0];
+	bag = rosbags[0]
 
 	index = 0
 	#Create a for loop to go through all bags
@@ -81,17 +83,17 @@ def parserplot(testtitle, rosbags, bagtitles, names, path):
 
 		#Get Relative Position NED Values
 		for i in range(0, len(flags)):
-
-			north.append(variables.relPosNED[i][0])
-			east.append(variables.relPosNED[i][1])
-			up.append(-1.0*variables.relPosNED[i][2])
-			relposheading.append(variables.relPosHeading[i])
 			timestamp = (variables.secs_rel[i]-variables.secs_rel[0] +
 				 (variables.nsecs_rel[i]-variables.nsecs_rel[0])*10.0**(-9))
+			if(timestamp >= start_time):
+			#print(variables.relPosNED[i])
+				north.append(variables.relPosNED[i][0]+variables.relPosNEDHP[i][0])
+				east.append(variables.relPosNED[i][1]+variables.relPosNEDHP[i][1])
+				up.append(-1.0*variables.relPosNED[i][2]+variables.relPosNEDHP[i][2])
+				relposheading.append(variables.relPosHeading[i])
+				time.append(timestamp)
 			if timestamp < 0:
 				pass
-			else:
-				time.append(timestamp)
 		#print(north)
 
 
@@ -104,6 +106,9 @@ def parserplot(testtitle, rosbags, bagtitles, names, path):
 		temp = variables.sec
 		veltime = []
 		startsec = variables.sec[0]
+		longitude = []
+		latitude = []
+		altitude = []
 
 
 		#Find velNED
@@ -119,6 +124,10 @@ def parserplot(testtitle, rosbags, bagtitles, names, path):
 				velnorth.append(variables.velNED[i][0])
 				veleast.append(variables.velNED[i][1])
 				velup.append(-1.0*variables.velNED[i][2])
+				longitude.append(variables.lla[1])
+				latitude.append(variables.lla[0])
+				altitude.append(variables.lla[2])
+
 
 		#Flags
 		"""figureflags = plt.figure()
@@ -129,11 +138,11 @@ def parserplot(testtitle, rosbags, bagtitles, names, path):
 		plt.scatter(time, flags)
 		plt.savefig(path+name+'flags.png')
 		#set_trace()
-		#plt.legend()
+		#plt.legend()"""
 
 		#North Position
 		figurenorth = plt.figure()
-		figurenorth.suptitle(name + ' North Position')
+		figurenorth.suptitle('Relative North Position: Experimental RTK')
 		plt.xlabel('Time (sec)')
 		plt.ylabel('North (m)')
 		plt.axis([0, time[len(time)-1], stat.mean(north)-2*stat.stdev(north),
@@ -147,7 +156,7 @@ def parserplot(testtitle, rosbags, bagtitles, names, path):
 
 		#East Position
 		figureeast = plt.figure()
-		figureeast.suptitle(name + ' East Position')
+		figureeast.suptitle('Relative East Position: Experimental RTK')
 		plt.xlabel('Time (sec)')
 		plt.ylabel('East (m)')
 		plt.axis([0, time[len(time)-1], stat.mean(east)-2*stat.stdev(east),
@@ -161,7 +170,7 @@ def parserplot(testtitle, rosbags, bagtitles, names, path):
 
 		#Up Position
 		figureup = plt.figure()
-		figureup.suptitle(name + ' Vertical Position')
+		figureup.suptitle('Experimental RTK Accuracy' + ' Vertical Position')
 		plt.xlabel('Time (sec)')
 		plt.ylabel('Up')
 		plt.axis([0, time[len(time)-1], stat.mean(up)-2*stat.stdev(up),
@@ -173,8 +182,17 @@ def parserplot(testtitle, rosbags, bagtitles, names, path):
 		plt.legend()
 		plt.savefig(path+name+'vertpos.png')
 
+		figurene = plt.figure()
+		figurene.suptitle('Experimental RTK Accuracy' + ' N-E Position')
+		plt.xlabel('East (m)')
+		plt.ylabel('North (m)')
+		plt.scatter(east, north, 1, label='Data')
+		plt.legend()
+		plt.savefig(path+name+'nepos.png')
+
+
 		#North Velocity
-		figurevelnorth = plt.figure()
+		"""figurevelnorth = plt.figure()
 		figurevelnorth.suptitle(name + ' North Velocity')
 		plt.xlabel('Time (sec)')
 		plt.ylabel('North Velocity (m/s)')
@@ -215,7 +233,7 @@ def parserplot(testtitle, rosbags, bagtitles, names, path):
 		plt.legend()
 		plt.savefig(path+name+'vertvel.png')"""
 
-		figurerelposheading = plt.figure()
+		"""figurerelposheading = plt.figure()
 		figurerelposheading.suptitle(name + ' Relative Position Heading')
 		plt.xlabel('Time (sec)')
 		plt.ylabel('Heading (Radians)')
@@ -236,7 +254,7 @@ def parserplot(testtitle, rosbags, bagtitles, names, path):
 		plt.scatter(east, north, 1, label = 'Position')
 		plt.savefig(path+name+'northeastpos.png')
 
-		#print(index)
+		#print(index)"""
 		index = index + 1
 
 		"""stddevnorth = stddevnorth + stat.stdev(north)
@@ -254,7 +272,7 @@ def parserplot(testtitle, rosbags, bagtitles, names, path):
 
 	#Cycle through all the rosbags to get all the data.
 	#for rosbag in rosbags:
-	stddevnorth = 0
+	"""stddevnorth = 0
 	stddeveast = 0
 	stddevup = 0
 	stddevvelnorth = 0
@@ -267,7 +285,7 @@ def parserplot(testtitle, rosbags, bagtitles, names, path):
 	stddevup = stddevup/index
 	stddevvelnorth = stddevvelnorth/index
 	stddevveleast = stddevveleast/index
-	stddevvelup = stddevvelup/index
+	stddevvelup = stddevvelup/index"""
 
 	return [stddevnorth, stddeveast, stddevup, stddevvelnorth, stddevveleast, stddevvelup]
 

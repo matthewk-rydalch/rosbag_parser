@@ -1,26 +1,22 @@
 <?xml version="1.0"?>
 
 <data>
-    <file>
-        <name>rover-10-4-stationary.bag</name>
-        <path>/home/magicc/rtk_tests/stationary/</path>
-        <plot title="Stationary Test Oct 4, 2019">
-            <scatter>
-                <x-axis>
-				    <topic>/rover/RelPos</topic>
-				    <section>relPosN</section>
-			    </x-axis>
-			    <y-axis>
-				    <topic>/rover/RelPos</topic>
-				    <section>relPosE</section>
-			    </y-axis>
-                <z-axis>
+    <figure>
+        <axes type="2d" title="Rover North Position vs Time">
+            <scatter color="b" marker="." line="">
+                <axis title="Time (sec)">
+                    <path>/home/magicc/rtk_tests/stationary/</path>
+                    <bag>rover-10-4-stationary.bag</bag>
                     <topic>/rover/RelPos</topic>
-                    <section>relPosD</section>
-                </z-axis>
+                    <section>time</section>
+                </axis>
+                <axis>
+                    <path>/home/magicc/rtk_tests/stationary/</path>
+                    <bag>rover-10-4-stationary.bag</bag>
+                    <topic>/rover/RelPos</topic>
+                    <section>relPosN</section>
+                </axis>
             </scatter>
-        </plot>
-
-    </file>
-
+        </axes>
+    </figure>
 </data>

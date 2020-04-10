@@ -8,13 +8,148 @@ import sys
 import rosbag
 import numpy as np
 import xml.etree.ElementTree as ET
+import statistics as stat
+import gmplot
+import WaypointConvert as wc
 
 def main():
-    tree = loadXML(sys.argv[1])  #Load from the XML file and return a tree
-    struct = parseXML(tree)
+    #tree = loadXML(sys.argv[1])  #Load from the XML file and return a tree
+    #struct = parseXML(tree)
 
-    print(len(struct.variable))
+    #print(len(struct.variable))
 
+    bag = rosbag.Bag('/home/magicc/rtk_tests/gnssvsrtk/mar03_2020nomvtbag/mar03_2020nomvtbag.bag')
+
+    lat = get_variables(bag, '/base/PosVelTime', 'lat')
+    longitude = get_variables(bag, '/base/PosVelTime', 'long')
+    alt = get_variables(bag, '/base/PosVelTime', 'alt')
+    time = get_variables(bag, '/base/PosVelTime', 'time')
+    base_horiz_acc = get_variables(bag, '/base/PosVelTime', 'hAcc')
+
+    rover_latitude = get_variables(bag, '/rover/PosVelTime', 'lat')
+    rover_longitude = get_variables(bag, '/rover/PosVelTime', 'long')
+    rover_altitude = get_variables(bag, '/rover/PosVelTime', 'alt')
+    rover_time = get_variables(bag, '/rover/PosVelTime', 'time')
+
+    rover_posveltime = get_variables(bag, '/rover/PosVelTime', '')
+    base_posveltime = get_variables(bag, '/base/PosVelTime', '')
+
+    relPosGPSTime = []
+    relPosGPS = []
+    relPosGPSN = []
+    relPosGPSE = []
+    relPosGPSD = []
+
+    base_start = 0
+    rover_start_time = rover_posveltime[0].header.stamp.secs+rover_posveltime[0].header.stamp.nsecs*10**(-9)
+
+    for msg in rover_posveltime:
+        rover_timestamp = msg.header.stamp.secs+msg.header.stamp.nsecs*10**(-9)
+
+        for base_index in range(base_start, len(base_posveltime)):
+            base_msg = base_posveltime[base_index]
+            base_timestamp = base_msg.header.stamp.secs+base_msg.header.stamp.nsecs*10**(-9)
+
+            if(base_timestamp>= rover_timestamp and base_index!=0 and rover_timestamp-rover_start_time>=5):
+                relPosGPSTime.append(rover_timestamp-rover_start_time)
+                relPosGPS_stamp = wc.to_meters(base_msg.lla[0], base_msg.lla[1], base_msg.lla[2], msg.lla[0], msg.lla[1], msg.lla[2], 0)
+                relPosGPS.append(wc.to_meters(base_msg.lla[0], base_msg.lla[1], base_msg.lla[2], msg.lla[0], msg.lla[1], msg.lla[2], 0))
+                relPosGPSN.append(relPosGPS_stamp[0])
+                relPosGPSE.append(relPosGPS_stamp[1])
+                base_start=base_index
+                break
+    
+
+    print(relPosGPS[0])
+    print(relPosGPSTime[0])
+
+    fig_gps_time_north = plt.figure()
+    fig_gps_time_north.suptitle('Relative North Position: Conventional GPS')
+    plt.xlabel('Time (s)')
+    plt.ylabel('GPS Relative North Position (m)')
+    plt.scatter(relPosGPSTime, relPosGPSN)
+    plt.plot(time, [stat.mean(relPosGPSN)]*len(time), 'r--', label = 'Mean Average: %.3f m' %stat.mean(relPosGPSN))
+    plt.plot(time, [stat.mean(relPosGPSN)-stat.stdev(relPosGPSN)]*len(time), 'g--', label = 'Standard Deviation: %.5f m' %stat.stdev(relPosGPSN))
+    plt.plot(time, [stat.mean(relPosGPSN)+stat.stdev(relPosGPSN)]*len(time), 'g--')
+    plt.legend()
+
+    fig_gps_time_east = plt.figure()
+    fig_gps_time_east.suptitle('Relative East Position: Conventional GPS')
+    plt.xlabel('Time (s)')
+    plt.ylabel('GPS Relative East Position (m)')
+    plt.scatter(relPosGPSTime, relPosGPSE)
+    plt.plot(time, [stat.mean(relPosGPSE)]*len(time), 'r--', label = 'Mean Average: %.3f m' %stat.mean(relPosGPSE))
+    plt.plot(time, [stat.mean(relPosGPSE)-stat.stdev(relPosGPSE)]*len(time), 'g--', label = 'Standard Deviation: %.5f m' %stat.stdev(relPosGPSE))
+    plt.plot(time, [stat.mean(relPosGPSE)+stat.stdev(relPosGPSE)]*len(time), 'g--')
+    plt.legend()
+
+
+
+    print('Base Latitude Length: %f' %len(lat))
+    print(len(longitude))
+    print(len(alt))
+    print(len(time))
+    print('Rover Latitude Length: %f' %len(rover_latitude))
+
+    figtimelat = plt.figure()
+    figtimelat.suptitle('Base Latitude vs Time')
+    plt.axis([0, time[len(time)-1], stat.mean(lat)-2*stat.stdev(lat),stat.mean(lat)+3*stat.stdev(lat)])
+    plt.xlabel('Time (s)')
+    plt.ylabel('Latitude (Degrees)')
+    plt.scatter(time, lat)
+    plt.plot(time, [stat.mean(lat)]*len(time), 'r--', label = 'Mean Average: %.3f degrees' %stat.mean(lat))
+    plt.plot(time, [stat.mean(lat)-stat.stdev(lat)]*len(time), 'g--', label = 'Standard Deviation: %.5f degrees' %stat.stdev(lat))
+    plt.plot(time, [stat.mean(lat)+stat.stdev(lat)]*len(time), 'g--')
+    plt.legend()
+
+    figtimelong = plt.figure()
+    figtimelong.suptitle('Base Longitude vs Time')
+    plt.axis([0, time[len(time)-1], stat.mean(longitude)-3*stat.stdev(longitude),stat.mean(longitude)+1*stat.stdev(longitude)])
+    plt.xlabel('Time (s)')
+    plt.ylabel('Longitude (Degrees)')
+    plt.scatter(time, longitude)
+    plt.plot(time, [stat.mean(longitude)]*len(time), 'r--', label = 'Mean Average: %.3f degrees' %stat.mean(longitude))
+    plt.plot(time, [stat.mean(longitude)-stat.stdev(longitude)]*len(time), 'g--', label = 'Standard Deviation: %.5f degrees' %stat.stdev(longitude))
+    plt.plot(time, [stat.mean(longitude)+stat.stdev(longitude)]*len(time), 'g--')
+    plt.legend()
+
+    figtimealt = plt.figure()
+    figtimealt.suptitle('Base Altitude vs Time')
+    plt.axis([0, time[len(time)-1], stat.mean(alt)-2*stat.stdev(alt),stat.mean(alt)+2*stat.stdev(alt)])
+    plt.xlabel('Time (s)')
+    plt.ylabel('Altitude (Meters)')
+    plt.scatter(time, alt)
+    plt.plot(time, [stat.mean(alt)]*len(time), 'r--', label = 'Mean Average: %.3f m' %stat.mean(alt))
+    plt.plot(time, [stat.mean(alt)-stat.stdev(alt)]*len(time), 'g--', label = 'Standard Deviation: %.5f m' %stat.stdev(alt))
+    plt.plot(time, [stat.mean(alt)+stat.stdev(alt)]*len(time), 'g--')
+    plt.legend()
+
+    figbase_horiz_acc = plt.figure()
+    figbase_horiz_acc.suptitle('Base Horizontal Accuracy Estimate')
+    plt.axis([0, time[len(time)-1], stat.mean(base_horiz_acc)-2*stat.stdev(base_horiz_acc),stat.mean(base_horiz_acc)+2*stat.stdev(base_horiz_acc)])
+    plt.xlabel('Time (s)')
+    plt.ylabel('Horizontal Accuracy (m)')
+    plt.scatter(time, base_horiz_acc)
+    plt.plot(time, [stat.mean(base_horiz_acc)]*len(time), 'r--', label = 'Mean Average: %.3f m' %stat.mean(base_horiz_acc))
+    plt.plot(time, [stat.mean(base_horiz_acc)-stat.stdev(base_horiz_acc)]*len(time), 'g--', label = 'Standard Deviation: %.5f m' %stat.stdev(base_horiz_acc))
+    plt.plot(time, [stat.mean(base_horiz_acc)+stat.stdev(base_horiz_acc)]*len(time), 'g--')
+    plt.legend()
+
+    gmap_base_latitude_longitude = gmplot.GoogleMapPlotter(stat.mean(lat), stat.mean(longitude), 23)
+    gmap_base_latitude_longitude.scatter(lat, longitude, color='b')
+    gmap_base_latitude_longitude.draw('/home/magicc/rtk_tests/gnssvsrtk/mar03_2020walkperimter/base_lat_long.html')
+
+    fig_base_latitude_longitude = plt.figure()
+    fig_base_latitude_longitude.suptitle('Base Latitude vs Longitude')
+    plt.axis([stat.mean(longitude)-4*stat.stdev(longitude), stat.mean(longitude)+2*stat.stdev(longitude), stat.mean(lat)-1*stat.stdev(lat),stat.mean(lat)+3*stat.stdev(lat)])
+    plt.xlabel('Longitude (Degrees)')
+    plt.ylabel('Latitude (Degrees)')
+    plt.scatter(longitude, lat)
+    plt.legend()
+
+
+
+    plt.show()
     # ani = animate(struct.variable[0])
 
     #arrow(path+name)
@@ -27,6 +162,7 @@ def updateNED(relPosNED, *fargs):
     ax = fargs[1]
     # print(relPosNED)
     ax.scatter(relPosNED[0], relPosNED[1], relPosNED[2], 'b.')
+
 
 
 #Animate
@@ -134,8 +270,6 @@ def rosplot(ax, plot_type):
     #set_trace()
     return variables
 
-#470 tanner 3:30
-
 def plot_3d(variables, axistitles, ax, plot_type = 'scatter', color='b', m='.', line=''):
     ax.set_xlabel(axistitles[0])
     ax.set_ylabel(axistitles[1])
@@ -161,7 +295,7 @@ def get_variables(bag, topic, section):
     #Normalize Time
     if section=='time':
         variable = normalizeTime(variable)
-    print("get_variables variables")
+    #print("get_variables variables")
     # print(variable)
     #set_trace()
     return variable
@@ -169,11 +303,11 @@ def get_variables(bag, topic, section):
         
 def get_section(msg, section, t=0):
     if section == 'relPosN':
-        return msg.relPosNED[0]
+        return msg.relPosNED[0]+msg.relPosHPNED[0]
     elif section == 'relPosE':
-        return msg.relPosNED[1]
+        return msg.relPosNED[1]+msg.relPosHPNED[1]
     elif section == 'relPosD':
-        return msg.relPosNED[2]
+        return msg.relPosNED[2]+msg.relPosHPNED[2]
     elif section == 'time' or section == 'rosbagtime':
         return [t.secs, t.nsecs]
     elif section == 'Yaw':
@@ -182,6 +316,14 @@ def get_section(msg, section, t=0):
         return msg.arrowRPY[1]
     elif section == 'posN' :
         return msg.position[0]
+    elif section == 'lat':
+        return msg.lla[0]
+    elif section == 'long':
+        return msg.lla[1]
+    elif section == 'alt':
+        return msg.lla[2]
+    elif section == '':
+        return msg
     else:
         return eval("msg."+section)
 
