@@ -31,23 +31,22 @@ def rosplot(bag, plot):
     variables = []
     axistitles = []
     title = plot.get('title')
-    plot_type=plot.get('plot_type')
 
-    # for plot_type in plot:
+    for plot_type in plot:
 
-    for axis in plot:
-        variables.append(get_variables(bag, axis.findtext('topic'), axis.findtext('section')))
-        axistitles.append(axis.findtext('topic')+"/"+axis.findtext('section'))
+        for axis in plot_type:
+            variables.append(get_variables(bag, axis.findtext('topic'), axis.findtext('section')))
+            axistitles.append(axis.findtext('topic')+"/"+axis.findtext('section'))
 
-    if(len(variables)==2):
-        #print("2D")
-        plot_2d(variables, axistitles, title, plot_type)
+        if(len(variables)==2):
+            #print("2D")
+            plot_2d(variables, axistitles, title, plot_type.tag)
 
-    elif(len(variables)==3):
-        #print("3D")
-        plot_3d(variables, axistitles, title, plot_type)
-    else:
-        print("Error: Too many axis")
+        elif(len(variables)==3):
+            #print("3D")
+            plot_3d(variables, axistitles, title, plot_type.tag)
+        else:
+            print("Error: Too many axis")
 
 #470 tanner 3:30
 
