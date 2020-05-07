@@ -38,9 +38,11 @@ def rosplot(bag, plot):
             variables.append(get_variables(bag, axis.findtext('topic'), axis.findtext('section')))
             axistitles.append(axis.findtext('topic')+"/"+axis.findtext('section'))
 
+        marker = plot_type.get('marker')
+
         if(len(variables)==2):
             #print("2D")
-            plot_2d(variables, axistitles, title, plot_type.tag)
+            plot_2d(variables, axistitles, title, plot_type.tag, marker)
 
         elif(len(variables)==3):
             #print("3D")
@@ -60,14 +62,15 @@ def plot_3d(variables, axistitles, title, plot_type = 'scatter'):
     eval('ax.'+plot_type+"(variables[0], variables[1], variables[2])")
     plt.show()
 
-def plot_2d(variables, axistitles = ['Axis 1', 'Axis 2'], title = 'No Title', plot_type = 'scatter'):
+def plot_2d(variables, axistitles = ['Axis 1', 'Axis 2'], title = 'No Title', plot_type = 'scatter', marker='.'):
+    fig = plt.figure()
     plt.xlabel(axistitles[0])
     plt.ylabel(axistitles[1])
     plt.suptitle(title)
-    plt.plot(variables[0], variables[1])
-    #eval('plt.'+plot_type+'(variables[0], variables[1])')
-    #for x in variables[0]:
-    #    print(x)
+    if(plot_type=='scatter'):
+        plt.scatter(variables[0], variables[1], marker=marker)
+    else:
+        plt.plot(variables[0], variables[1], marker=marker)
     plt.show()
 
 def get_variables(bag, topic, section):

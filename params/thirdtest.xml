@@ -1,20 +1,22 @@
 <data>
     <file>
         <name>thirdtest.bag</name>
-        <path>/home/magicc/rtk_tests/chain/thirdtest/</path>
+        <path>/home/magicc/data/chain/</path>
 		<plot title="RelPosNED">
-			<x-axis>
-				<topic>/rover/RelPos</topic>
-				<section>relPosN</section>
-			</x-axis>
-			<y-axis>
-				<topic>/rover/RelPos</topic>
-				<section>relPosE</section>
-			</y-axis>
-            <z-axis>
-                <topic>/rover/RelPos</topic>
-                <section>relPosD</section>
-            </z-axis>
+			<scatter>
+				<x-axis>
+					<topic>/rover/RelPos</topic>
+					<section>relPosN</section>
+				</x-axis>
+				<y-axis>
+					<topic>/rover/RelPos</topic>
+					<section>relPosE</section>
+				</y-axis>
+				<z-axis>
+					<topic>/rover/RelPos</topic>
+					<section>relPosD</section>
+				</z-axis>
+			</scatter>
 		</plot>
     </file>
 </data>

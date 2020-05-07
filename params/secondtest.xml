@@ -1,35 +1,39 @@
 <data>
     <file>
         <name>secondtest.bag</name>
-        <path>/home/magicc/rtk_tests/chain/secondtest/</path>
+        <path>/home/magicc/data/chain/</path>
 		<plot title="Rover RelPosNED">
-			<x-axis>
-				<topic>/rover/RelPos</topic>
-				<section>relPosN</section>
-			</x-axis>
-			<y-axis>
-				<topic>/rover/RelPos</topic>
-				<section>relPosE</section>
-			</y-axis>
-            <z-axis>
-                <topic>/rover/RelPos</topic>
-                <section>relPosD</section>
-            </z-axis>
+			<scatter>
+				<x-axis>
+					<topic>/rover/RelPos</topic>
+					<section>relPosN</section>
+				</x-axis>
+				<y-axis>
+					<topic>/rover/RelPos</topic>
+					<section>relPosE</section>
+				</y-axis>
+				<z-axis>
+					<topic>/rover/RelPos</topic>
+					<section>relPosD</section>
+				</z-axis>
+			</scatter>
 		</plot>
 		
 		<plot title="Brover RelPosNED">
-			<x-axis>
-				<topic>/brover/RelPos</topic>
-				<section>relPosN</section>
-			</x-axis>
-			<y-axis>
-				<topic>/brover/RelPos</topic>
-				<section>relPosE</section>
-			</y-axis>
-			<z-axis>
-				<topic>/brover/RelPos</topic>
-				<section>relPosD</section>
-			</z-axis>
+			<scatter>
+				<x-axis>
+					<topic>/brover/RelPos</topic>
+					<section>relPosN</section>
+				</x-axis>
+				<y-axis>
+					<topic>/brover/RelPos</topic>
+					<section>relPosE</section>
+				</y-axis>
+				<z-axis>
+					<topic>/brover/RelPos</topic>
+					<section>relPosD</section>
+				</z-axis>
+			</scatter>
 		</plot>
     </file>
 </data>
