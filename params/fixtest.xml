@@ -1,0 +1,30 @@
+<data>
+    <file>
+        <name>thirdtest.bag</name>
+        <path>/home/magicc/data/chain/</path>
+		<plot title="Rover Fix">
+			<scatter marker='.'>
+				<x-axis>
+					<topic>/rover/RelPos</topic>
+					<section>time</section>
+				</x-axis>
+				<y-axis>
+					<topic>/rover/RelPos</topic>
+					<section>flags</section>
+				</y-axis>
+			</scatter>
+		</plot>
+        <plot title="Brover Fix">
+			<scatter marker='.'>
+				<x-axis>
+					<topic>/brover/RelPos</topic>
+					<section>time</section>
+				</x-axis>
+				<y-axis>
+					<topic>/brover/RelPos</topic>
+					<section>flags</section>
+				</y-axis>
+			</scatter>
+		</plot>
+    </file>
+</data>
