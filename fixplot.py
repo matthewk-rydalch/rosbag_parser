@@ -8,15 +8,16 @@ import numpy as np
 import xml.etree.ElementTree as ET
 import math
 import parserplot
-import bitarray
 
-fig, axs = plt.subplots(2,2)
+fig, axs = plt.subplots(3,2)
 
 bagnames = []
 bagnames.append(['/home/magicc/Downloads/rover_moving_laptop.bag', 'moving', 'Laptop Moving'])
 bagnames.append(['/home/magicc/Downloads/rover_moving_tx2.bag', 'stationary', 'TX2 Moving'])
 bagnames.append(['/home/magicc/Downloads/rover_stationary_laptop.bag', 'stationary', 'Laptop Stationary'])
 bagnames.append(['/home/magicc/Downloads/rover_stationary_tx2.bag', 'stationary', 'TX2 Stationary'])
+bagnames.append(['/home/magicc/Downloads/taylor_onebase.bag', 'stationary', 'Odroid'])
+bagnames.append(['/home/magicc/Downloads/taylor_onecomp.bag', 'stationary', 'Odroid'])
 
 i=0
 for name in bagnames:
