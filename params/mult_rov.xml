@@ -1,0 +1,38 @@
+<data>
+    <file>
+        <name>2020-05-22-14-36-43.bag</name>
+        <path>/home/magicc/data/multi-rover/</path>
+		<plot title="RelPosNED1">
+			<scatter>
+				<x-axis>
+					<topic>/rover1/RelPos</topic>
+					<section>relPosN</section>
+				</x-axis>
+				<y-axis>
+					<topic>/rover1/RelPos</topic>
+					<section>relPosE</section>
+				</y-axis>
+				<z-axis>
+					<topic>/rover1/RelPos</topic>
+					<section>relPosD</section>
+				</z-axis>
+			</scatter>
+        </plot>
+        <plot title="RelPosNED2">
+            <scatter>
+                <x-axis>
+					<topic>/rover2/RelPos</topic>
+					<section>relPosN</section>
+				</x-axis>
+				<y-axis>
+					<topic>/rover2/RelPos</topic>
+					<section>relPosE</section>
+				</y-axis>
+				<z-axis>
+					<topic>/rover2/RelPos</topic>
+					<section>relPosD</section>
+				</z-axis>
+			</scatter>
+		</plot>
+    </file>
+</data>
