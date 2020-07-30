@@ -3,97 +3,96 @@ from IPython.core.debugger import set_trace
 import rosbag
 import pickle
 from collections import namedtuple
+import numpy as np
+from geometry_msgs.msg import Pose
 
 def main():
 
-	filename = 'rover_binary.bag'
-	bag = rosbag.Bag('../../../data/rtk_tests/altitude/' + filename)
-	# bag = rosbag.Bag(filename)
-	# foldername = 'redo_rod/one/'
-	# bag = rosbag.Bag('../../../data/' + foldername + 'data_fixed.bag')
+	#TODO the file name and bag are from a rtk_flight test
+	filename = 'error_test1.bag'
+	bag = rosbag.Bag('../../../data/ragnarok_tests/' + filename)
 	data = Parser()
-	# variables = data.get_varaibles(bag, foldername)
-	variables = data.get_variables(bag, filename)
+	relpos = data.get_RelPos(bag)
 	bag.close()
-	return variables
+
+	MyStruct = namedtuple("mystruct", "plt")#, plt_virt, drone, hl_cmd, is_flying, is_landing, odom")
+	vals = MyStruct(plt)#, plt_virt, drone, hl_cmd, is_flying, is_landing, odom)
+
+	return vals
 
 class Parser:
-	def get_variables(self, bag, filename):
 
-		relPosNED = []
-		relPosNEDHP = []
-		relPosLength = []
-		relPosHPLength = []
-		flags = []
-		secs_rel = []
-		nsecs_rel = []
-		secs_pos = []
-		nsecs_pos = []
-		lla = []
-		position = []
-		UTC_sec = []
-		UTC_nsec = []
-		meanXYZ = []
-		year = []
-		month = []
-		day = []
-		hour = []
-		minute = []
+	def get_PosVelECEF(self, bag):
 		sec = []
-		nano = []
-		# set_trace()
-		for topic, msg, t in bag.read_messages(topics=['/rover/RelPos']):
-			relPosNED.append(msg.relPosNED)
-			# relPosNEDHP.append(msg.relPosHPNED)
-			relPosLength.append(msg.relPosLength)
-			# relPosHPLength.append(msg.relPosHPLength)
+		nsec = []
+		pn = []
+		pe = []
+		pd = []
+		horizontal_accuracy = []
+		verticle_accuracy = []
+		speed_accuracy = []
+
+		for topic, msg, t in bag.read_messages(topics=['/base/PosVelEcef']):  
+			sec.append(msg.header.stamp.secs)
+			nsec.append(msg.header.stamp.nsecs)			
+			pn.append(msg.position[0])
+			pe.append(msg.position[1])
+			pd.append(msg.position[2])
+			horizontal_accuracy.append(msg.horizontal_accuracy)
+			verticle_accuracy.append(msg.vertical_accuracy)
+			speed_accuracy.append(msg.speed_accuracy)
+
+		return sec, nsec, pn, pe, pd, horizontal_accuracy, verticle_accuracy, speed_accuracy
+        
+	def get_PosVelTime(self, bag):
+		sec = []
+		nsec = []
+		flags = []
+		numSV = []
+
+		for topic, msg, t in bag.read_messages(topics=['/rover/PosVelTime']):  
+			sec.append(msg.header.stamp.secs)
+			nsec.append(msg.header.stamp.nsecs)			
 			flags.append(msg.flags)
-			secs_rel.append(msg.header.stamp.secs)
-			nsecs_rel.append(msg.header.stamp.nsecs)
+			numSV.append(msg.numSV)
 
-		for topic, msg, t in bag.read_messages(topics=['/base/PosVelTime']):
-			secs_pos.append(msg.header.stamp.secs)
-			nsecs_pos.append(msg.header.stamp.nsecs)
-			lla.append(msg.lla)
-			year.append(msg.year)
-			month.append(msg.month)
-			day.append(msg.day)
-			hour.append(msg.hour)
-			minute.append(msg.min)
-			sec.append(msg.sec)
-			nano.append(msg.nano)
+		return sec, nsec, flags, numSV
 
-		for topic, msg, t in bag.read_messages(topics=['/rover/PosVelEcef']):
-			position.append(msg.position);
+	def get_RelPos(self, bag):
+		sec = []
+		nsec = []
+		RP_N = []
+		RP_E = []
+		RP_D = []
+		N_hp = []
+		E_hp = []
+		D_hp = []
 
-		for topic, msg, t in bag.read_messages(topics=['/base/SurveyStatus']):
-			meanXYZ.append(msg.meanXYZ)
+		flag = []
+		
+		for topic, msg, t in bag.read_messages(topics=['/rover/RelPos']):
+				
+			sec.append(msg.header.stamp.secs)
+			nsec.append(msg.header.stamp.nsecs)
+			RP_N.append(msg.relPosNED[0])
+			RP_E.append(msg.relPosNED[1])
+			RP_D.append(msg.relPosNED[2])
+			N_hp.append(msg.relPosHPNED[0])
+			E_hp.append(msg.relPosHPNED[1])
+			D_hp.append(msg.relPosHPNED[2])
 
-		# for topic, msg, t in bag.read_messages(topics=['/rover/Obs']):
-		# 	UTC_sec.append(msg.header.stamp)
-			# UTC_nsec.append(msg.header.stamp.nsec)
+			flag.append(msg.flags)
 
-		# for topic, msg, t in bag.read_messages(topics=['/rover/Ephemeris']):
-		# 	position.append(msg.position);
+		relpos = [sec, nsec, RP_N, RP_E, RP_D, N_hp, E_hp, D_hp, flag]
+		
+		return relpos
 
-		# for topic, msg, t in bag.read_messages(topics=['/rover/GlonassEphemeris']):
-		# 	position.append(msg.position);
-
-		MyStruct = namedtuple("mystruct", "relPosNED, relPosLength, \
-		flags, sec_rel, nsec_rel, sec_pos, nsec_pos, lla, year, month, day, hour, \
-		minute, sec, nano, position, meanXYZ")
-		# MyStruct = namedtuple("mystruct", "relPosNED, relPosNEDHP, relPosLength, relPosHPLength, \
-		# flags, sec_rel, nsec_rel, sec_pos, nsec_pos, lla, year, month, day, hour, \
-		# minute, sec, nano, position, meanXYZ")
-
-		# variables = MyStruct(relPosNED, relPosNEDHP, relPosLength, relPosHPLength, \
-		# flags, secs_rel, nsecs_rel, secs_pos, nsecs_pos, lla, year, month, day, hour, \
-		# minute, sec, nano, position, meanXYZ)
-		variables = MyStruct(relPosNED, relPosNED, relPosLength, relPosLength, \
-		flags, secs_rel, nsecs_rel, secs_pos, nsecs_pos, lla, year, month, day, hour, \
-		minute, sec, nano, position, meanXYZ)
-
-		return variables
+class pos_orient_time:
+	def __init__(self, sec, nsec, x, y, z, orientation):
+		self.sec = sec
+		self.nsec = nsec
+		self.position = [x, y, z]
+		self.orientation = orientation
 
 if __name__ == '__main__':
-    variables = main()
+    vals = main()
