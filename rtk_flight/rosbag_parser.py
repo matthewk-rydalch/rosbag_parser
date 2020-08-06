@@ -372,13 +372,70 @@ class Parser:
 
 		return sec, nsec, RP_N, RP_E, RP_D, N_hp, E_hp, D_hp, flag
 
+	def get_truth_boat(self, bag):
+		sec = []
+		nsec = []
+		x = []
+		y = []
+		z = []
+		quat_x = []
+		quat_y = []
+		quat_z = []
+		quat_w = []
+		u = []
+		v = []
+		w = []
+		p = []
+		q = []
+		r = []
+
+		for topic, msg, t in bag.read_messages(topics=['/truth/boat']):
+			sec.append(msg.header.stamp.secs)
+			nsec.append(msg.header.stamp.nsecs)
+			x.append(msg.pose.pose.position.x)
+			y.append(msg.pose.pose.position.y)
+			z.append(msg.pose.pose.position.z)
+			quat_x.append(msg.pose.pose.orientation.x)
+			quat_y.append(msg.pose.pose.orientation.y)
+			quat_z.append(msg.pose.pose.orientation.z)
+			quat_w.append(msg.pose.pose.orientation.w)
+			u.append(msg.twist.twist.linear.x)
+			v.append(msg.twist.twist.linear.y)
+			w.append(msg.twist.twist.linear.z)
+			p.append(msg.twist.twist.angular.x)
+			q.append(msg.twist.twist.angular.y)
+			r.append(msg.twist.twist.angular.z)			
+
+		return pos_orient_time(sec, nsec, x, y, z, quat_x, quat_y, quat_z, quat_w, u, v, w, p, q, r)
+
+	def get_boatIMU_data(self, bag):
+
+		sec = []
+		nsec = []
+		accel_x = []
+		accel_y = []
+		accel_z = []
+
+		for topic, msg, t in bag.read_messages(topics=['/boat_imu/data']):  
+			sec.append(msg.header.stamp.secs)
+			nsec.append(msg.header.stamp.nsecs)			
+			accel_x.append(msg.linear_acceleration.x)
+			accel_y.append(msg.linear_acceleration.y)
+			accel_z.append(msg.linear_acceleration.z)
+
+		imu_data = nedTime(sec, nsec, accel_x, accel_y, accel_z)
+
+		return imu_data
+
 class pos_orient_time:
-	def __init__(self, sec, nsec, x, y, z, orientation):
+	def __init__(self, sec, nsec, x, y, z, quat_x, quat_y, quat_z, quat_w, u, v, w, p, q, r):
 		
 		self.time = np.array(sec)+np.array(nsec)*1E-9
 		
 		self.position = [x, y, z]
-		self.orientation = orientation
+		self.orientation = [quat_x, quat_y, quat_z, quat_w]
+		self.velocity = [u, v, w]
+		self.angular_velocity = [p, q, r]
 
 class nedTime:
 	def __init__(self, sec, nsec, north, east, down):
