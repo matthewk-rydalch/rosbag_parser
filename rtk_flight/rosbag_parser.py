@@ -80,24 +80,40 @@ class Parser:
 
 	def get_multirotor_odom(self, bag):
 		
-		drone_sec = []
-		drone_nsec = []
-		drone_x = []
-		drone_y = []
-		drone_z = []
-		drone_orientation = []
+		sec = []
+		nsec = []
+		x = []
+		y = []
+		z = []
+		quat_x = []
+		quat_y = []
+		quat_z = []
+		quat_w = []
+		u = []
+		v = []
+		w = []
+		p = []
+		q = []
+		r = []
 
 		for topic, msg, t in bag.read_messages(topics=['/multirotor/odom']):
-			drone_sec.append(msg.header.stamp.secs)
-			drone_nsec.append(msg.header.stamp.nsecs)			
-			drone_x.append(msg.pose.pose.position.x)
-			drone_y.append(msg.pose.pose.position.y)
-			drone_z.append(msg.pose.pose.position.z)
-			drone_orientation.append(msg.pose.pose.orientation)
-		
-		drone = pos_orient_time(drone_sec, drone_nsec, drone_x, drone_y, drone_z, drone_orientation)
-	
-		return drone
+			sec.append(msg.header.stamp.secs)
+			nsec.append(msg.header.stamp.nsecs)
+			x.append(msg.pose.pose.position.x)
+			y.append(msg.pose.pose.position.y)
+			z.append(msg.pose.pose.position.z)
+			quat_x.append(msg.pose.pose.orientation.x)
+			quat_y.append(msg.pose.pose.orientation.y)
+			quat_z.append(msg.pose.pose.orientation.z)
+			quat_w.append(msg.pose.pose.orientation.w)
+			u.append(msg.twist.twist.linear.x)
+			v.append(msg.twist.twist.linear.y)
+			w.append(msg.twist.twist.linear.z)
+			p.append(msg.twist.twist.angular.x)
+			q.append(msg.twist.twist.angular.y)
+			r.append(msg.twist.twist.angular.z)			
+
+		return pos_orient_time(sec, nsec, x, y, z, quat_x, quat_y, quat_z, quat_w, u, v, w, p, q, r)
 
 	
 	def get_multirotor_ned(self, bag):
@@ -334,15 +350,29 @@ class Parser:
 		accel_x = []
 		accel_y = []
 		accel_z = []
+		ang_vel_x = []
+		ang_vel_y = []
+		ang_vel_z = []
+		orient_x = []
+		orient_y = []
+		orient_z = []
+		orient_w = []
 
 		for topic, msg, t in bag.read_messages(topics=['/imu/data']):  
 			sec.append(msg.header.stamp.secs)
-			nsec.append(msg.header.stamp.nsecs)			
+			nsec.append(msg.header.stamp.nsecs)
+			orient_x.append(msg.orientation.x)
+			orient_y.append(msg.orientation.y)
+			orient_z.append(msg.orientation.z)
+			orient_w.append(msg.orientation.w)	
 			accel_x.append(msg.linear_acceleration.x)
 			accel_y.append(msg.linear_acceleration.y)
 			accel_z.append(msg.linear_acceleration.z)
+			ang_vel_x.append(msg.angular_velocity.x)
+			ang_vel_y.append(msg.angular_velocity.y)
+			ang_vel_z.append(msg.angular_velocity.z)
 
-		imu_data = nedTime(sec, nsec, accel_x, accel_y, accel_z)
+		imu_data = imuTime(sec, nsec, orient_w, orient_x, orient_y, orient_z, ang_vel_x, ang_vel_y, ang_vel_z, accel_x, accel_y, accel_z)
 
 		return imu_data
 
@@ -372,7 +402,7 @@ class Parser:
 
 		return sec, nsec, RP_N, RP_E, RP_D, N_hp, E_hp, D_hp, flag
 
-	def get_truth_boat(self, bag):
+	def get_truth(self, bag):
 		sec = []
 		nsec = []
 		x = []
@@ -389,7 +419,7 @@ class Parser:
 		q = []
 		r = []
 
-		for topic, msg, t in bag.read_messages(topics=['/truth/boat']):
+		for topic, msg, t in bag.read_messages(topics=['/truth/NED']):
 			sec.append(msg.header.stamp.secs)
 			nsec.append(msg.header.stamp.nsecs)
 			x.append(msg.pose.pose.position.x)
@@ -408,6 +438,82 @@ class Parser:
 
 		return pos_orient_time(sec, nsec, x, y, z, quat_x, quat_y, quat_z, quat_w, u, v, w, p, q, r)
 
+
+	def get_truth_boat(self, bag):
+		sec = []
+		nsec = []
+		x = []
+		y = []
+		z = []
+		quat_x = []
+		quat_y = []
+		quat_z = []
+		quat_w = []
+		u = []
+		v = []
+		w = []
+		p = []
+		q = []
+		r = []
+
+		for topic, msg, t in bag.read_messages(topics=['/boat_state']):
+			sec.append(msg.header.stamp.secs)
+			nsec.append(msg.header.stamp.nsecs)
+			x.append(msg.pose.pose.position.x)
+			y.append(msg.pose.pose.position.y)
+			z.append(msg.pose.pose.position.z)
+			quat_x.append(msg.pose.pose.orientation.x)
+			quat_y.append(msg.pose.pose.orientation.y)
+			quat_z.append(msg.pose.pose.orientation.z)
+			quat_w.append(msg.pose.pose.orientation.w)
+			u.append(msg.twist.twist.linear.x)
+			v.append(msg.twist.twist.linear.y)
+			w.append(msg.twist.twist.linear.z)
+			p.append(msg.twist.twist.angular.x)
+			q.append(msg.twist.twist.angular.y)
+			r.append(msg.twist.twist.angular.z)			
+
+		return pos_orient_time(sec, nsec, x, y, z, quat_x, quat_y, quat_z, quat_w, u, v, w, p, q, r)
+
+
+	def get_base_odom(self, bag):
+
+		sec = []
+		nsec = []
+		x = []
+		y = []
+		z = []
+		quat_x = []
+		quat_y = []
+		quat_z = []
+		quat_w = []
+		u = []
+		v = []
+		w = []
+		p = []
+		q = []
+		r = []
+
+		for topic, msg, t in bag.read_messages(topics=['/base/odom']):
+			sec.append(msg.header.stamp.secs)
+			nsec.append(msg.header.stamp.nsecs)
+			x.append(msg.pose.pose.position.x)
+			y.append(msg.pose.pose.position.y)
+			z.append(msg.pose.pose.position.z)
+			quat_x.append(msg.pose.pose.orientation.x)
+			quat_y.append(msg.pose.pose.orientation.y)
+			quat_z.append(msg.pose.pose.orientation.z)
+			quat_w.append(msg.pose.pose.orientation.w)
+			u.append(msg.twist.twist.linear.x)
+			v.append(msg.twist.twist.linear.y)
+			w.append(msg.twist.twist.linear.z)
+			p.append(msg.twist.twist.angular.x)
+			q.append(msg.twist.twist.angular.y)
+			r.append(msg.twist.twist.angular.z)			
+
+		return pos_orient_time(sec, nsec, x, y, z, quat_x, quat_y, quat_z, quat_w, u, v, w, p, q, r)
+
+
 	def get_boatIMU_data(self, bag):
 
 		sec = []
@@ -415,15 +521,64 @@ class Parser:
 		accel_x = []
 		accel_y = []
 		accel_z = []
+		ang_vel_x = []
+		ang_vel_y = []
+		ang_vel_z = []
+		orient_x = []
+		orient_y = []
+		orient_z = []
+		orient_w = []
 
 		for topic, msg, t in bag.read_messages(topics=['/boat_imu/data']):  
 			sec.append(msg.header.stamp.secs)
-			nsec.append(msg.header.stamp.nsecs)			
+			nsec.append(msg.header.stamp.nsecs)
+			orient_x.append(msg.orientation.x)
+			orient_y.append(msg.orientation.y)
+			orient_z.append(msg.orientation.z)
+			orient_w.append(msg.orientation.w)	
 			accel_x.append(msg.linear_acceleration.x)
 			accel_y.append(msg.linear_acceleration.y)
 			accel_z.append(msg.linear_acceleration.z)
+			ang_vel_x.append(msg.angular_velocity.x)
+			ang_vel_y.append(msg.angular_velocity.y)
+			ang_vel_z.append(msg.angular_velocity.z)
 
-		imu_data = nedTime(sec, nsec, accel_x, accel_y, accel_z)
+		# imu_data = nedTime(sec, nsec, accel_x, accel_y, accel_z)
+		# imu_data = nedTime(sec, nsec, ang_vel_x, ang_vel_y, ang_vel_z)
+		imu_data = quatTime(sec, nsec, orient_w, orient_x, orient_y, orient_z)
+
+		return imu_data
+
+	def get_base_imu_data(self, bag):
+
+		sec = []
+		nsec = []
+		accel_x = []
+		accel_y = []
+		accel_z = []
+		ang_vel_x = []
+		ang_vel_y = []
+		ang_vel_z = []
+		orient_x = []
+		orient_y = []
+		orient_z = []
+		orient_w = []
+
+		for topic, msg, t in bag.read_messages(topics=['/boat_imu_br']):  
+			sec.append(msg.header.stamp.secs)
+			nsec.append(msg.header.stamp.nsecs)
+			orient_x.append(msg.orientation.x)
+			orient_y.append(msg.orientation.y)
+			orient_z.append(msg.orientation.z)
+			orient_w.append(msg.orientation.w)	
+			accel_x.append(msg.linear_acceleration.x)
+			accel_y.append(msg.linear_acceleration.y)
+			accel_z.append(msg.linear_acceleration.z)
+			ang_vel_x.append(msg.angular_velocity.x)
+			ang_vel_y.append(msg.angular_velocity.y)
+			ang_vel_z.append(msg.angular_velocity.z)
+
+		imu_data = imuTime(sec, nsec, orient_w, orient_x, orient_y, orient_z, ang_vel_x, ang_vel_y, ang_vel_z, accel_x, accel_y, accel_z)
 
 		return imu_data
 
@@ -433,7 +588,7 @@ class pos_orient_time:
 		self.time = np.array(sec)+np.array(nsec)*1E-9
 		
 		self.position = [x, y, z]
-		self.orientation = [quat_x, quat_y, quat_z, quat_w]
+		self.orientation = [quat_w, quat_x, quat_y, quat_z]
 		self.velocity = [u, v, w]
 		self.angular_velocity = [p, q, r]
 
@@ -464,6 +619,35 @@ class ecefTime:
 		self.x = x
 		self.y = y
 		self.z = z
+
+class quatTime:
+	def __init__(self, sec, nsec, w, x, y, z):
+
+		self.time = np.array(sec)+np.array(nsec)*1E-9
+
+		self.qw = w
+		self.qx = x
+		self.qy = y
+		self.qz = z
+
+
+class imuTime:
+	def __init__(self, sec, nsec, orient_w, orient_x, orient_y, orient_z, ang_vel_x, ang_vel_y, ang_vel_z, accel_x, accel_y, accel_z):
+
+		self.time = np.array(sec)+np.array(nsec)*1E-9
+
+		self.qw = orient_w
+		self.qx = orient_x
+		self.qy = orient_y
+		self.qz = orient_z
+
+		self.wx = ang_vel_x
+		self.wy = ang_vel_y
+		self.wz = ang_vel_z
+
+		self.ax = accel_x
+		self.ay = accel_y
+		self.az = accel_z
 
 
 if __name__ == '__main__':

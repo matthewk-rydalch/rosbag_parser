@@ -9,12 +9,12 @@ def main():
 	
 	data = Parser()
 
-	filename = 'moving_landing2.bag'
-	bag = rosbag.Bag('../../../data/ragnarok_tests/flights_0729/' + filename)
+	filename = 'debug.bag'
+	bag = rosbag.Bag('../../../data/' + filename)
 
 	# data_type = 'm2u'
-	data_type = 'outdoor'
-	# data_type = 'sim'
+	#data_type = 'outdoor'
+	data_type = 'sim'
 	odom, hlc = get_data(data, bag, data_type)
 	get_north_data(odom, hlc)
 	get_east_data(odom, hlc)
