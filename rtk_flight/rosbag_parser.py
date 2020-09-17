@@ -234,11 +234,31 @@ class Parser:
 
 		for topic, msg, t in bag.read_messages(topics=['/high_level_command']):  
 			hl_cmd_sec.append(msg.header.stamp.secs)
-			hl_cmd_nsec.append(msg.header.stamp.nsecs)			
+			hl_cmd_nsec.append(msg.header.stamp.nsecs)		
 			hl_cmd_x.append(msg.x)
 			hl_cmd_y.append(msg.y)
 			hl_cmd_z.append(msg.F)
 			hl_cmd_orientation.append(msg.z)
+		
+		hl_cmd = pos_orient_time(hl_cmd_sec, hl_cmd_nsec, hl_cmd_x, hl_cmd_y, hl_cmd_z, hl_cmd_orientation)
+
+		return hl_cmd
+
+	def get_master_branch_high_level_command(self, bag):
+		hl_cmd_sec = []
+		hl_cmd_nsec = []
+		hl_cmd_x = []
+		hl_cmd_y = []
+		hl_cmd_z = []
+		hl_cmd_orientation = []
+
+		for topic, msg, t in bag.read_messages(topics=['/high_level_command']):  
+			hl_cmd_sec.append(msg.stamp.secs)
+			hl_cmd_nsec.append(msg.stamp.nsecs)		
+			hl_cmd_x.append(msg.cmd1)
+			hl_cmd_y.append(msg.cmd2)
+			hl_cmd_z.append(-msg.cmd3) #need to negate/ convert ned to neu
+			hl_cmd_orientation.append(msg.cmd4)
 		
 		hl_cmd = pos_orient_time(hl_cmd_sec, hl_cmd_nsec, hl_cmd_x, hl_cmd_y, hl_cmd_z, hl_cmd_orientation)
 

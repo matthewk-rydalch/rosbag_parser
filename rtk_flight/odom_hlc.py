@@ -9,11 +9,13 @@ def main():
 	
 	data = Parser()
 
-	filename = 'moving_landing2.bag'
-	bag = rosbag.Bag('../../../data/ragnarok_tests/flights_0729/' + filename)
+	filename = 'z_wait20_18.bag'
+	bag = rosbag.Bag('../../../data/mocap/control_test_0910/' + filename)
 
+	data_type = 'mocap_master_branch'
+	# data_type = 'mocap'
 	# data_type = 'm2u'
-	data_type = 'outdoor'
+	# data_type = 'outdoor'
 	# data_type = 'sim'
 	odom, hlc = get_data(data, bag, data_type)
 	get_north_data(odom, hlc)
@@ -23,28 +25,40 @@ def main():
 
 def get_data(data, bag, data_type):
 
-	if data_type == 'm2u':
-	
-		odom = data.get_odom(bag)
-	
-		hlc = data.get_high_level_command(bag) #used for mocap2ublox
+	if data_type == 'mocap_master_branch':
 		
+		odom = data.get_odom(bag)
+
+		hlc = data.get_master_branch_high_level_command(bag) #used for master branch (byu) mocap
+
+	elif data_type == 'mocap':
+
+		odom = data.get_odom(bag)
+
+		hlc = data.get_high_level_command(bag) #used for mocap
+
+	elif data_type == 'm2u':
+
+		odom = data.get_odom(bag)
+
+		hlc = data.get_high_level_command(bag) #used for mocap2ublox
+
 	elif data_type == 'outdoor':
-	
+
 		odom = data.get_odom(bag)		
 
 		hlc = data.get_high_level_command(bag)
-	
+
 	elif data_type == 'sim':
-	
+
 		odom = data.get_multirotor_odom(bag)
 
 		hlc = data.get_multirotor_high_level_command(bag)
-		
+
 	else:
 		print('invalid data_type')
-	
-	bag.close()
+
+		bag.close()
 
 	return odom, hlc
 
@@ -113,6 +127,7 @@ def plot_2(fig_num, t_x, x, xlabel, t_y, y, ylabel):
 	plt.plot(t_x, x, label = xlabel)
 	plt.plot(t_y, y, label = ylabel)
 	plt.legend(loc = "upper right")
+	plt.show()
 
 
 if __name__ == '__main__':
