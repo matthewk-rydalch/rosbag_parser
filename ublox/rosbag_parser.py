@@ -1,5 +1,5 @@
 #be sure to specify filename in this file
-from IPython.core.debugger import set_trace
+# from IPython.core.debugger import set_trace
 import rosbag
 import pickle
 from collections import namedtuple
@@ -25,38 +25,62 @@ class Parser:
 	def get_PosVelECEF(self, bag):
 		sec = []
 		nsec = []
+		lon = []
+		lat = []
+		alt = []
 		pn = []
 		pe = []
 		pd = []
-		horizontal_accuracy = []
-		verticle_accuracy = []
-		speed_accuracy = []
 
-		for topic, msg, t in bag.read_messages(topics=['/base/PosVelEcef']):  
+		for topic, msg, t in bag.read_messages(topics=['/rover/PosVelEcef']):
+			sec.append(msg.header.stamp.secs)
+			nsec.append(msg.header.stamp.nsecs)
+			lon.append(msg.lla[0])
+			lat.append(msg.lla[1])
+			alt.append(msg.lla[2])
+			pn.append(msg.position[0])
+			pe.append(msg.position[1])
+			pd.append(msg.position[2])
+
+		return gps_time(sec,nsec,lon,lat,alt,pn,pe,pd)
+
+	def get_boat_PosVelECEF(self, bag):
+		sec = []
+		nsec = []
+		lon = []
+		lat = []
+		alt = []
+		pn = []
+		pe = []
+		pd = []
+
+		for topic, msg, t in bag.read_messages(topics=['/boat/PosVelEcef']):  
+			sec.append(msg.header.stamp.secs)
+			nsec.append(msg.header.stamp.nsecs)
+			lon.append(msg.lla[0])
+			lat.append(msg.lla[1])
+			alt.append(msg.lla[2])
+			pn.append(msg.position[0])
+			pe.append(msg.position[1])
+			pd.append(msg.position[2])
+
+		return gps_time(sec,nsec,lon,lat,alt,pn,pe,pd)
+        
+	def get_PosVelTime(self, bag):
+		sec = []
+		nsec = []
+		pn = []
+		pe = []
+		pd = []
+
+		for topic, msg, t in bag.read_messages(topics=['/rover/PosVelTime']):  
 			sec.append(msg.header.stamp.secs)
 			nsec.append(msg.header.stamp.nsecs)			
 			pn.append(msg.position[0])
 			pe.append(msg.position[1])
 			pd.append(msg.position[2])
-			horizontal_accuracy.append(msg.horizontal_accuracy)
-			verticle_accuracy.append(msg.vertical_accuracy)
-			speed_accuracy.append(msg.speed_accuracy)
 
-		return sec, nsec, pn, pe, pd, horizontal_accuracy, verticle_accuracy, speed_accuracy
-        
-	def get_PosVelTime(self, bag):
-		sec = []
-		nsec = []
-		flags = []
-		numSV = []
-
-		for topic, msg, t in bag.read_messages(topics=['/rover/PosVelTime']):  
-			sec.append(msg.header.stamp.secs)
-			nsec.append(msg.header.stamp.nsecs)			
-			flags.append(msg.flags)
-			numSV.append(msg.numSV)
-
-		return sec, nsec, flags, numSV
+		# return gps_time(sec,nsec,pn,pe,pd)
 
 	def get_RelPos(self, bag):
 		sec = []
@@ -83,7 +107,7 @@ class Parser:
 
 			flag.append(msg.flags)
 
-		relpos = [sec, nsec, RP_N, RP_E, RP_D, N_hp, E_hp, D_hp, flag]
+		relpos = relpos_time(sec,nsec,RP_N,RP_E,RP_D)
 		
 		return relpos
 
@@ -93,6 +117,17 @@ class pos_orient_time:
 		self.nsec = nsec
 		self.position = [x, y, z]
 		self.orientation = orientation
+
+class relpos_time:
+	def __init__(self, sec, nsec, x, y, z):
+		self.time = np.array(sec)+np.array(nsec)*1E-9
+		self.position = [x,y,z]
+
+class gps_time:
+	def __init__(self, sec, nsec, lon, lat, alt, x, y, z):
+		self.time = np.array(sec)+np.array(nsec)*1E-9
+		self.lla = [lon,lat,alt]
+		self.position = [x,y,z]
 
 if __name__ == '__main__':
     vals = main()

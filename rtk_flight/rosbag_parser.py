@@ -1,5 +1,5 @@
 #be sure to specify filename in this file
-from IPython.core.debugger import set_trace
+# from IPython.core.debugger import set_trace
 import rosbag
 import pickle
 from collections import namedtuple
@@ -35,26 +35,26 @@ class Parser:
 		error = [err_x, err_y, err_z]
 
 		return error
-	def get_platform_odom(self, bag):
-		plt_sec = []
-		plt_nsec = []
-		plt_x = []
-		plt_y = []
-		plt_z = []
-		plt_orientation = []
 
-		#parse bag and convert from NWU position to NED
-		for topic, msg, t in bag.read_messages(topics=['/platform/odom']):  
-			plt_sec.append(msg.header.stamp.secs)
-			plt_nsec.append(msg.header.stamp.nsecs)			
-			plt_x.append(msg.pose.pose.position.x)
-			plt_y.append(-msg.pose.pose.position.y)
-			plt_z.append(-msg.pose.pose.position.z)
-			plt_orientation.append(msg.pose.pose.orientation)
+	def get_boat_odom(self, bag):
+		boat_sec = []
+		boat_nsec = []
+		boat_x = []
+		boat_y = []
+		boat_z = []
+		boat_orientation = []
 
-		plt = pos_orient_time(plt_sec, plt_nsec, plt_x, plt_y, plt_z, plt_orientation)
+		for topic, msg, t in bag.read_messages(topics=['/boat/odom']):  
+			boat_sec.append(msg.header.stamp.secs)
+			boat_nsec.append(msg.header.stamp.nsecs)			
+			boat_x.append(msg.pose.pose.position.x)
+			boat_y.append(msg.pose.pose.position.y)
+			boat_z.append(msg.pose.pose.position.z)
+			boat_orientation.append(msg.pose.pose.orientation)
 
-		return plt
+		boat = pos_orient_time(boat_sec, boat_nsec, boat_x, boat_y, boat_z, boat_orientation)
+
+		return boat
 
 	def get_multirotor_platform_virtual_odometry(self, bag):
 		
@@ -378,7 +378,7 @@ class Parser:
 
 		flag = []
 
-		for topic, msg, t in bag.read_messages(topics=['/RelPos']):
+		for topic, msg, t in bag.read_messages(topics=['/rover/RelPos']):
 			sec.append(msg.header.stamp.secs)
 			nsec.append(msg.header.stamp.nsecs)
 			RP_N.append(msg.relPosNED[0])
