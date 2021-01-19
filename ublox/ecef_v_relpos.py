@@ -6,18 +6,10 @@ import numpy as np
 from collections import namedtuple
 
 def main():
-	# ecef = np.array([-1797871.09,-4532604.1,4099820.49])
-	# ecefOrigin = np.array([-1797870.50,-4532603.59,4099821.23])
-	# refLla = np.array([40.25,-111.65,1410.29])
-	# ecef = np.array([200000000-1.15,200000000.0-1.15,200000000.0+1.15])
-	# ecefOrigin = np.array([200000000,200000000.0,200000000.0])
-	# refLla = np.array([45.0,-45.0,1000])
 
-	# ned = pve2ned(ecef, ecefOrigin, refLla)
-	# print('ecef = ', ecef, 'ned = ', ned)
 	data = Parser()
 
-	filename = 'landing_ublox_jan18_4.bag'
+	filename = 'landing_ublox_jan18_1.bag'
 	bag = rosbag.Bag('../../data/outdoor/' + filename)
 
 	data_type = 'outdoor'
@@ -26,8 +18,6 @@ def main():
 	# data_type = 'outdoor'
 	# data_type = 'sim'
 	roverNED, boatNED, relpos = get_data(data, bag, data_type)
-	# roverNED = pve2ned(roverPVE,roverPVE)
-	# boatNED = pve2ned(boatNED,roverPVE)
 	get_north_data(roverNED, boatNED, relpos)
 	get_east_data(roverNED, boatNED, relpos)
 	get_down_data(roverNED, boatNED, relpos)
@@ -40,8 +30,8 @@ def get_data(data, bag, data_type):
 		boatPVE = data.get_boat_PosVelECEF(bag)
 		relpos = data.get_RelPos(bag)
 
-		roverNED = pve2ned(roverPVE,roverPVE)
 		boatNED = pve2ned(boatPVE,roverPVE)
+		roverNED = pve2ned(roverPVE,roverPVE)
 		# relpos = -relpos
 
 	else:
@@ -117,6 +107,8 @@ def get_north_data(roverEcef, boatEcef, relpos):
 	for i in range(len(boatEcef_time)-1):
 		while (roverEcef_time[j] < boatEcef_time[i]):
 			j = j+1
+		if (j == len(roverEcef_time)-1):
+			break
 		delta_time.append(roverEcef_time[j])
 		delta_n.append(roverEcef.position[0][j] - boatEcef.position[0][i])
 
@@ -138,6 +130,8 @@ def get_east_data(roverEcef, boatEcef, relpos):
 	for i in range(len(boatEcef_time)-1):
 		while (roverEcef_time[j] < boatEcef_time[i]):
 			j = j+1
+		if (j == len(roverEcef_time)-1):
+			break
 		delta_time.append(roverEcef_time[j])
 		delta_e.append(roverEcef.position[1][j] - boatEcef.position[1][i])
 
@@ -159,6 +153,8 @@ def get_down_data(roverEcef, boatEcef, relpos):
 	for i in range(len(boatEcef_time)-1):
 		while (roverEcef_time[j] < boatEcef_time[i]):
 			j = j+1
+		if (j == len(roverEcef_time)-1):
+			break
 		delta_time.append(roverEcef_time[j])
 		delta_d.append(roverEcef.position[2][j] - boatEcef.position[2][i])
 

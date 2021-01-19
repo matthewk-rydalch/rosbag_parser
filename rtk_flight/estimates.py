@@ -9,7 +9,7 @@ def main():
 	
 	data = Parser()
 
-	filename = 'landing_ublox_jan18_1.bag'
+	filename = 'landing_ublox_jan18_5.bag'
 	bag = rosbag.Bag('../../data/outdoor/' + filename)
 
 	data_type = 'outdoor'
