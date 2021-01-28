@@ -9,8 +9,11 @@ def main():
 	
 	data = Parser()
 
-	filename = 'landing_ublox_jan18_5.bag'
-	bag = rosbag.Bag('../../data/outdoor/' + filename)
+	# filename = 'estimated_filtered_alt_error.bag'
+	# bag = rosbag.Bag('../../data/' + filename)
+	#
+	filename = 'alt_error.bag'
+	bag = rosbag.Bag('../../data/ragnarok_tests/flights_0125/' + filename)
 
 	data_type = 'outdoor'
 	# data_type = 'mocap'
@@ -45,13 +48,15 @@ def get_north_data(odom, boatOdom, relpos):
 
 	delta_time = []
 	delta_n = []
-	odom_time = odom.time - odom.time[0]
+	odom_time = odom.time - odom.time[0] - 9.27
 	odom_n = np.array(odom.position[0])
-	boatOdom_time = boatOdom.time - boatOdom.time[0]
+	boatOdom_time = boatOdom.time - boatOdom.time[0] + 9.3
 	boatOdom_n = np.array(boatOdom.position[0])
 	j = 0
 	for i in range(len(boatOdom_time)-1):
 		while (odom_time[j] < boatOdom_time[i]):
+			if (j==len(odom_time)-1):
+				break;
 			j = j+1
 		delta_time.append(odom_time[j])
 		delta_n.append(odom_n[j] - boatOdom_n[i])
@@ -68,13 +73,15 @@ def get_east_data(odom, boatOdom, relpos):
 
 	delta_time = []
 	delta_e = []
-	odom_time = odom.time - odom.time[0]
+	odom_time = odom.time - odom.time[0] - 9.27
 	odom_e = np.array(odom.position[1])
-	boatOdom_time = boatOdom.time - boatOdom.time[0]
+	boatOdom_time = boatOdom.time - boatOdom.time[0] +9.3
 	boatOdom_e = np.array(boatOdom.position[1])
 	j = 0
 	for i in range(len(boatOdom_time)-1):
 		while (odom_time[j] < boatOdom_time[i]):
+			if (j==len(odom_time)-1):
+				break;
 			j = j+1
 		delta_time.append(odom_time[j])
 		delta_e.append(odom_e[j] - boatOdom_e[i])
@@ -92,13 +99,15 @@ def get_down_data(odom, boatOdom, relpos):
 
 	delta_time = []
 	delta_d = []
-	odom_time = odom.time - odom.time[0]
+	odom_time = odom.time - odom.time[0] - 9.27
 	odom_d = np.array(odom.position[2])
-	boatOdom_time = boatOdom.time - boatOdom.time[0]
+	boatOdom_time = boatOdom.time - boatOdom.time[0] +9.3
 	boatOdom_d = np.array(boatOdom.position[2])
 	j = 0
 	for i in range(len(boatOdom_time)-1):
 		while (odom_time[j] < boatOdom_time[i]):
+			if (j==len(odom_time)-1):
+				break;
 			j = j+1
 		delta_time.append(odom_time[j])
 		delta_d.append(odom_d[j] - boatOdom_d[i])

@@ -317,35 +317,46 @@ class Parser:
 	def get_PosVelECEF(self, bag):
 		sec = []
 		nsec = []
-		horizontal_accuracy = []
-		verticle_accuracy = []
-		speed_accuracy = []
 		lon = []
 		lat = []
 		alt = []
-		ecef_x = []
-		ecef_y = []
-		ecef_z = []
+		pn = []
+		pe = []
+		pd = []
 
-		for topic, msg, t in bag.read_messages(topics=['/PosVelEcef']):  
+		for topic, msg, t in bag.read_messages(topics=['/rover/PosVelEcef']):
 			sec.append(msg.header.stamp.secs)
-			nsec.append(msg.header.stamp.nsecs)			
-			horizontal_accuracy.append(msg.horizontal_accuracy)
-			verticle_accuracy.append(msg.vertical_accuracy)
-			speed_accuracy.append(msg.speed_accuracy)
-			lat.append(msg.lla[0])
-			lon.append(msg.lla[1])
+			nsec.append(msg.header.stamp.nsecs)
+			lon.append(msg.lla[0])
+			lat.append(msg.lla[1])
 			alt.append(msg.lla[2])
-			ecef_x.append(msg.position[0])
-			ecef_y.append(msg.position[1])
-			ecef_z.append(msg.position[2])
+			pn.append(msg.position[0])
+			pe.append(msg.position[1])
+			pd.append(msg.position[2])
 
+		return gps_time(sec,nsec,lon,lat,alt,pn,pe,pd)
 
-		accuracy = [sec, nsec, horizontal_accuracy, verticle_accuracy, speed_accuracy]
-		lla = llaTime(sec, nsec, lat, lon, alt)
-		ecef = ecefTime(sec, nsec, ecef_x, ecef_y, ecef_z)
+	def get_boat_PosVelECEF(self, bag):
+		sec = []
+		nsec = []
+		lon = []
+		lat = []
+		alt = []
+		pn = []
+		pe = []
+		pd = []
 
-		return lla, ecef
+		for topic, msg, t in bag.read_messages(topics=['/boat/PosVelEcef']):
+			sec.append(msg.header.stamp.secs)
+			nsec.append(msg.header.stamp.nsecs)
+			lon.append(msg.lla[0])
+			lat.append(msg.lla[1])
+			alt.append(msg.lla[2])
+			pn.append(msg.position[0])
+			pe.append(msg.position[1])
+			pd.append(msg.position[2])
+
+		return gps_time(sec,nsec,lon,lat,alt,pn,pe,pd)
 
 	def get_imu(self, bag):
 
@@ -428,6 +439,11 @@ class ecefTime:
 		self.y = y
 		self.z = z
 
+class gps_time:
+	def __init__(self, sec, nsec, lon, lat, alt, x, y, z):
+		self.time = np.array(sec)+np.array(nsec)*1E-9
+		self.lla = [lon,lat,alt]
+		self.position = [x,y,z]
 
 if __name__ == '__main__':
     vals = main()
