@@ -68,7 +68,7 @@ class Parser:
 		wy = []
 		wz = []
 
-		for topic, msg, t in bag.read_messages(topics=[self.imuTopic]):
+		for topic, msg, t in bag.read_messages(topics=[self.baseImuTopic]):
 			sec.append(msg.header.stamp.secs)
 			nsec.append(msg.header.stamp.nsecs)
 			ax.append(msg.linear_acceleration.x)
