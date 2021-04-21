@@ -5,12 +5,14 @@ import numpy as np
 from scipy.spatial.transform import Rotation as R
 
 class Parser:
-	def __init__(self,flightModeTopic,missionStateTopic,baseGpsTopic,baseImuTopic,roverRelPosTopic):
+	def __init__(self,flightModeTopic,missionStateTopic,baseGpsTopic,baseImuTopic,roverRelPosTopic,roverGpsTopic,baseOdomTopic):
 		self.flightModeTopic = flightModeTopic
 		self.missionStateTopic = missionStateTopic
 		self.baseGpsTopic = baseGpsTopic
 		self.baseImuTopic = baseImuTopic
 		self.roverRelPosTopic = roverRelPosTopic
+		self.roverGpsTopic = roverGpsTopic
+		self.baseOdomTopic = baseOdomTopic
 
 	def get_flight_mode(self, bag):
 		sec = []
@@ -18,8 +20,8 @@ class Parser:
 		flightMode = []
 
 		for topic, msg, t in bag.read_messages(topics=[self.flightModeTopic]):
-			sec.append(msg.header.stamp.secs)
-			nsec.append(msg.header.stamp.nsecs)
+			sec.append(t.secs)
+			nsec.append(t.nsecs)
 			flightMode.append(msg.point.x)
 
 		return FlightMode(sec,nsec,flightMode)
@@ -30,8 +32,8 @@ class Parser:
 		missionState = []
 
 		for topic, msg, t in bag.read_messages(topics=[self.missionStateTopic]):
-			sec.append(msg.header.stamp.secs)
-			nsec.append(msg.header.stamp.nsecs)
+			sec.append(t.secs)
+			nsec.append(t.nsecs)
 			missionState.append(msg.point.x)
 
 		return MissionState(sec,nsec,missionState)
@@ -47,8 +49,8 @@ class Parser:
 		vz = []
 
 		for topic, msg, t in bag.read_messages(topics=[self.baseGpsTopic]):
-			sec.append(msg.header.stamp.secs)
-			nsec.append(msg.header.stamp.nsecs)
+			sec.append(t.secs)
+			nsec.append(t.nsecs)
 			px.append(msg.position[0])
 			py.append(msg.position[1])
 			pz.append(msg.position[2])
@@ -69,8 +71,8 @@ class Parser:
 		wz = []
 
 		for topic, msg, t in bag.read_messages(topics=[self.baseImuTopic]):
-			sec.append(msg.header.stamp.secs)
-			nsec.append(msg.header.stamp.nsecs)
+			sec.append(t.secs)
+			nsec.append(t.nsecs)
 			ax.append(msg.linear_acceleration.x)
 			ay.append(msg.linear_acceleration.y)
 			az.append(msg.linear_acceleration.z)
@@ -91,8 +93,8 @@ class Parser:
 		pdHp = []
 
 		for topic, msg, t in bag.read_messages(topics=[self.roverRelPosTopic]):
-			sec.append(msg.header.stamp.secs)
-			nsec.append(msg.header.stamp.nsecs)
+			sec.append(t.secs)
+			nsec.append(t.nsecs)
 			pn.append(msg.relPosNED[0])
 			pe.append(msg.relPosNED[1])
 			pd.append(msg.relPosNED[2])
@@ -101,6 +103,66 @@ class Parser:
 			pdHp.append(msg.relPosHPNED[2])
 
 		return RelPos(sec,nsec,pn,pe,pd,pnHp,peHp,pdHp)
+
+	def get_rover_gps(self, bag):
+			sec = []
+			nsec = []
+			px = []
+			py = []
+			pz = []
+			vx = []
+			vy = []
+			vz = []
+			lat = []
+			lon = []
+			alt = []
+
+			for topic, msg, t in bag.read_messages(topics=[self.roverGpsTopic]):
+					sec.append(msg.header.stamp.secs)
+					nsec.append(msg.header.stamp.nsecs)
+					px.append(msg.position[0])
+					py.append(msg.position[1])
+					pz.append(msg.position[2])
+					vx.append(msg.velocity[0])
+					vy.append(msg.velocity[1])
+					vz.append(msg.velocity[2])
+					lat.append(msg.lla[0])
+					lon.append(msg.lla[1])
+					alt.append(msg.lla[2])
+
+			return Gps(sec,nsec,px,py,pz,vx,vy,vz),refLla(lat,lon,alt)
+
+
+	def get_odom(self, bag):
+                sec = []
+                nsec = []
+                pn = []
+                pe = []
+                pd = []
+                qx = []
+                qy = []
+                qz = []
+                qw = []
+                vx = []
+                vy = []
+                vz = []
+
+                for topic, msg, t in bag.read_messages(topics=[self.baseOdomTopic]):
+                        sec.append(msg.header.stamp.secs)
+                        nsec.append(msg.header.stamp.nsecs)
+                        pn.append(msg.pose.pose.position.x)
+                        pe.append(msg.pose.pose.position.y)
+                        pd.append(msg.pose.pose.position.z)
+                        qx.append(msg.pose.pose.orientation.x)
+                        qy.append(msg.pose.pose.orientation.y)
+                        qz.append(msg.pose.pose.orientation.z)
+                        qw.append(msg.pose.pose.orientation.w)
+                        vx.append(msg.twist.twist.linear.x)
+                        vy.append(msg.twist.twist.linear.y)
+                        vz.append(msg.twist.twist.linear.z)
+
+                return RelPos(sec,nsec,pn,pe,pd), Odom(sec,nsec,0.0,0.0,0.0,qx,qy,qz,qw,vx,vy,vz)
+
 
 class FlightMode:
 	def __init__(self,sec,nsec,flightMode):
@@ -134,3 +196,21 @@ class RelPos:
 		pe = np.array(pe) + np.array(peHp)
 		pd = np.array(pd) + np.array(pdHp)
 		self.position = np.array([pn,pe,pd])
+
+class Odom:
+	def __init__(self,sec,nsec,pn,pe,pd,qx,qy,qz,qw,vx,vy,vz):
+		self.time = np.array(sec)+np.array(nsec)*1E-9
+		# self.time -= self.time[0]
+		self.position = np.array([pn,pe,pd])
+		quat = np.array([qx,qy,qz,qw]).T
+		eulerRad = R.from_quat(quat).as_euler('xyz').T
+		self.euler = eulerRad*180.0/np.pi
+		self.velocity = np.array([vx,vy,vz])
+
+class refLla:
+	def __init__(self,lat,lon,alt):
+		self.lat = lat[0]
+		self.lon = lon[0]
+		self.alt = alt[0]
+
+

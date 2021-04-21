@@ -7,28 +7,51 @@ import statistics as stats
 def main():
 	flightModeTopic = '/flight_mode'
 	missionStateTopic = '/mission_state'
-	baseGpsTopic = '/p2u/base/PosVelEcef'
+	baseGpsTopic = '/base/PosVelEcef'
 	baseImuTopic = '/base/imu'
-	roverRelPosTopic = '/p2u/rover/RelPos'
-	data = Parser(flightModeTopic,missionStateTopic,baseGpsTopic,baseImuTopic,roverRelPosTopic)
-	filename = 'p2u.bag'
-	bag = rosbag.Bag('/home/matt/data/boatLanding_sim/' + filename)
+	roverRelPosTopic = '/rover/RelPos'
+	roverGpsTopic = '/dummyTopic'
+	baseOdomTopic = '/dummyTopic'
+	data = Parser(flightModeTopic,missionStateTopic,baseGpsTopic,baseImuTopic,roverRelPosTopic,roverGpsTopic,baseOdomTopic)
+	bagNames = ['flightAFast.bag','flightB.bag','flightD.bag','flightE.bag']
 
-	flightMode,missionState,gps,imu,relPos = get_data(data,bag)
+	timeOfFlightList = []
+	startDistanceList = []
+	speedList = []
+	accelList = []
+	angRatesList = []
+	for i in range(len(bagNames)):
+		bag = rosbag.Bag('/home/matt/data/px4flight/outdoor/0420/' + bagNames[i])
+		flightMode,missionState,gps,imu,relPos = get_data(data,bag)
 
-	timeOfFlight,timeInterval = calc_time_of_flight(flightMode,missionState)
-	relPosTimeIndeces = find_time_interval_indeces(relPos,timeInterval)
-	relPosStart = calc_rel_pos_start_data(relPos,relPosTimeIndeces)
-	speedTimeIndeces = find_time_interval_indeces(gps,timeInterval)
-	speedMean,speedStdDev = calc_speed_data(gps,speedTimeIndeces)
-	accelTimeIndeces = find_time_interval_indeces(imu,timeInterval)
-	accelMean,accelStdDev = calc_accel_data(imu,accelTimeIndeces)
-	angRatesTimeIndeces = find_time_interval_indeces(imu,timeInterval)
-	angRatesMean,angRatesStdDev = calc_ang_rates_data(imu,angRatesTimeIndeces)
+		timeOfFlight,timeInterval = calc_time_of_flight(flightMode,missionState)
+		timeOfFlightList.append(timeOfFlight)
+		print('time of flight = ', timeOfFlight)
+		relPosTimeIndeces = find_time_interval_indeces(relPos,timeInterval)
+		startDistance = calc_start_distance_data(relPos,relPosTimeIndeces)
+		startDistanceList.append(startDistance)
 
-	print('starting distance away', relPosStart)
-	
-	print('time of flight = ', timeOfFlight)
+		speedTimeIndeces = find_time_interval_indeces(gps,timeInterval)
+		speed = calc_speed_data(gps,speedTimeIndeces)
+		speedList.extend(speed)
+
+		accelTimeIndeces = find_time_interval_indeces(imu,timeInterval)
+		accel = calc_accel_data(imu,accelTimeIndeces)
+		accelList.extend(accel)
+
+		angRatesTimeIndeces = find_time_interval_indeces(imu,timeInterval)
+		angRates = calc_ang_rates_data(imu,angRatesTimeIndeces)
+		angRatesList.extend(angRates)
+
+	startDistanceMean,startDistanceStdDev = get_stats(startDistanceList)
+	speedMean,speedStdDev = get_stats(speedList)
+	accelMean,accelStdDev = get_stats(accelList)
+	angRatesMean,angRatesStdDev = get_stats(angRatesList)
+	timeOfFlightMean,timeOfFlightStdDev = get_stats(timeOfFlightList)
+
+	print('starting distance away data:')
+	print('		mean = ', startDistanceMean)
+	print('		std dev = ', startDistanceStdDev)
 
 	print('speed data:')
 	print('		mean = ', speedMean)
@@ -41,6 +64,10 @@ def main():
 	print('angular rates data:')
 	print('		mean = ', angRatesMean)
 	print('		std dev = ', angRatesStdDev)
+		
+	print('time of flight data:')
+	print('		mean =', timeOfFlightMean)
+	print('		std dev = ', timeOfFlightStdDev)
 
 def calc_time_of_flight(flightMode,missionState):
 	startTime = 0.0
@@ -70,7 +97,7 @@ def find_time_interval_indeces(x,timeInterval):
 	timeIntervalIndeces = [startIndex,endIndex]
 	return timeIntervalIndeces
 
-def calc_rel_pos_start_data(relPos,timeIndeces):
+def calc_start_distance_data(relPos,timeIndeces):
 	relPosStart = np.linalg.norm(relPos.position[:,timeIndeces[0]])
 	return relPosStart
 
@@ -79,27 +106,44 @@ def calc_speed_data(gps,timeIndeces):
 	for i in range(timeIndeces[0],timeIndeces[1]):
 		normVelocityI = np.linalg.norm(gps.velocity[:,i])
 		speedList.append(normVelocityI)
-	speedMean = stats.mean(speedList)
-	speedStdDev = stats.stdev(speedList)
-	return speedMean,speedStdDev
+	return speedList
 
 def calc_accel_data(imu,timeIndeces):
 	accelList = []
+	alpha = 0.02
+	filteredAccelX = low_pass_filter(imu.accel[0,:],alpha)
+	filteredAccelY = low_pass_filter(imu.accel[1,:],alpha)
+	filteredAccelZ = low_pass_filter(imu.accel[2,:],alpha)
 	for i in range(timeIndeces[0],timeIndeces[1]):
-		normAccelI = np.linalg.norm(imu.accel[:,i]) - 9.81
+		accelINoGravity = [filteredAccelX[i],filteredAccelY[i],filteredAccelZ[i]+9.81]
+		normAccelI = np.linalg.norm(accelINoGravity)
 		accelList.append(normAccelI)
-	accelMean = stats.mean(accelList)
-	accelStdDev = stats.stdev(accelList)
-	return accelMean,accelStdDev
+	return accelList
 
 def calc_ang_rates_data(imu,timeIndeces):
 	omegaList = []
+	alpha = 0.02
+	filteredOmegaX = low_pass_filter(imu.omega[0,:],alpha)
+	filteredOmegaY = low_pass_filter(imu.omega[1,:],alpha)
 	for i in range(timeIndeces[0],timeIndeces[1]):
-		normOmegaI = np.linalg.norm(imu.omega[:,i])
+		omegaIXY = [filteredOmegaX[i],filteredOmegaY[i]]
+		normOmegaI = np.linalg.norm(omegaIXY)
 		omegaList.append(normOmegaI)
-	omegaMean = stats.mean(omegaList)
-	omegaStdDev = stats.stdev(omegaList)
-	return omegaMean,omegaStdDev
+	return omegaList
+
+def low_pass_filter(signal,alpha):
+	filteredSignal = []
+	filteredSignal0 = signal[0]*alpha
+	filteredSignal.append(filteredSignal0)
+	for i in range(1,len(signal)):
+		filteredSignalI = signal[i]*alpha + filteredSignal[-1]*(1.0-alpha)
+		filteredSignal.append(filteredSignalI)
+	return filteredSignal
+
+def get_stats(x):
+	mean = stats.mean(x)
+	stdDev = stats.stdev(x)
+	return mean,stdDev
 
 def get_data(data, bag):
 	flightMode = data.get_flight_mode(bag)
