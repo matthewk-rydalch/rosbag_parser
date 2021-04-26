@@ -13,15 +13,39 @@ def main():
 	roverGpsTopic = '/dummyTopic'
 	baseOdomTopic = '/dummyTopic'
 	data = Parser(flightModeTopic,missionStateTopic,baseGpsTopic,baseImuTopic,roverRelPosTopic,roverGpsTopic,baseOdomTopic)
-	bagNames = ['flightAFast.bag','flightB.bag','flightD.bag','flightE.bag']
+	bagNames1 = ['flightAFast.bag','flightB.bag','flightD.bag','flightE.bag','flightg.bag','flightH.bag']
+	bagNames2 = ['flightA.bag','flightB.bag','flightC.bag','flightD.bag','flightE.bag','flightF.bag','flightH.bag','flightI.bag']
 
 	timeOfFlightList = []
 	startDistanceList = []
 	speedList = []
 	accelList = []
 	angRatesList = []
-	for i in range(len(bagNames)):
-		bag = rosbag.Bag('/home/matt/data/px4flight/outdoor/0420/' + bagNames[i])
+	for i in range(len(bagNames1)):
+		bag = rosbag.Bag('/home/matt/data/px4flight/outdoor/0420/' + bagNames1[i])
+		flightMode,missionState,gps,imu,relPos = get_data(data,bag)
+
+		timeOfFlight,timeInterval = calc_time_of_flight(flightMode,missionState)
+		timeOfFlightList.append(timeOfFlight)
+		print('time of flight = ', timeOfFlight)
+		relPosTimeIndeces = find_time_interval_indeces(relPos,timeInterval)
+		startDistance = calc_start_distance_data(relPos,relPosTimeIndeces)
+		startDistanceList.append(startDistance)
+
+		speedTimeIndeces = find_time_interval_indeces(gps,timeInterval)
+		speed = calc_speed_data(gps,speedTimeIndeces)
+		speedList.extend(speed)
+
+		accelTimeIndeces = find_time_interval_indeces(imu,timeInterval)
+		accel = calc_accel_data(imu,accelTimeIndeces)
+		accelList.extend(accel)
+
+		angRatesTimeIndeces = find_time_interval_indeces(imu,timeInterval)
+		angRates = calc_ang_rates_data(imu,angRatesTimeIndeces)
+		angRatesList.extend(angRates)
+
+	for j in range(len(bagNames2)):
+		bag = rosbag.Bag('/home/matt/data/px4flight/outdoor/0424/' + bagNames2[j])
 		flightMode,missionState,gps,imu,relPos = get_data(data,bag)
 
 		timeOfFlight,timeInterval = calc_time_of_flight(flightMode,missionState)
