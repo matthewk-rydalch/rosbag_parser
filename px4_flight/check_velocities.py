@@ -6,15 +6,14 @@ import numpy as np
 import navpy
 
 def main():
-	flightModeTopic = '/dummyTopic'
-	missionStateTopic = '/dummyTopic'
+	flightModeTopic = '/flight_mode'
+	missionStateTopic = '/mission_state'
 	baseGpsTopic = '/base/PosVelEcef'
-	baseImuTopic = '/dummyTopic'
+	baseImuTopic = '/base/imu'
 	roverRelPosTopic = '/rover/RelPos'
 	roverGpsTopic = '/rover/PosVelEcef'
-	baseOdomTopic = '/dummyTopic'
-	baseVelTopic = '/base_velocity'
-	data = Parser(flightModeTopic,missionStateTopic,baseGpsTopic,baseImuTopic,roverRelPosTopic,roverGpsTopic,baseOdomTopic,baseVelTopic)
+	baseOdomTopic = '/base_odom'
+	data = Parser(flightModeTopic,missionStateTopic,baseGpsTopic,baseImuTopic,roverRelPosTopic,roverGpsTopic,baseOdomTopic)
 	filename = 'flightD.bag'
 	bag = rosbag.Bag('/home/matt/data/px4flight/outdoor/0420/' + filename)
 

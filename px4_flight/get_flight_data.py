@@ -13,7 +13,7 @@ def main():
 	roverGpsTopic = '/dummyTopic'
 	baseOdomTopic = '/dummyTopic'
 	data = Parser(flightModeTopic,missionStateTopic,baseGpsTopic,baseImuTopic,roverRelPosTopic,roverGpsTopic,baseOdomTopic)
-	bagNames = ['flightAFast.bag','flightB.bag','flightD.bag','flightE.bag']
+	bagNames = ['flightD.bag','flightE.bag']
 
 	timeOfFlightList = []
 	startDistanceList = []
@@ -26,7 +26,6 @@ def main():
 
 		timeOfFlight,timeInterval = calc_time_of_flight(flightMode,missionState)
 		timeOfFlightList.append(timeOfFlight)
-		print('time of flight = ', timeOfFlight)
 		relPosTimeIndeces = find_time_interval_indeces(relPos,timeInterval)
 		startDistance = calc_start_distance_data(relPos,relPosTimeIndeces)
 		startDistanceList.append(startDistance)

@@ -5,7 +5,7 @@ import numpy as np
 from scipy.spatial.transform import Rotation as R
 
 class Parser:
-	def __init__(self,flightModeTopic,missionStateTopic,baseGpsTopic,baseImuTopic,roverRelPosTopic,roverGpsTopic,baseOdomTopic):
+	def __init__(self,flightModeTopic,missionStateTopic,baseGpsTopic,baseImuTopic,roverRelPosTopic,roverGpsTopic,baseOdomTopic,baseVelTopic="/dummyTopic"):
 		self.flightModeTopic = flightModeTopic
 		self.missionStateTopic = missionStateTopic
 		self.baseGpsTopic = baseGpsTopic
@@ -13,6 +13,7 @@ class Parser:
 		self.roverRelPosTopic = roverRelPosTopic
 		self.roverGpsTopic = roverGpsTopic
 		self.baseOdomTopic = baseOdomTopic
+		self.baseVelTopic = baseVelTopic
 
 	def get_flight_mode(self, bag):
 		sec = []
@@ -118,8 +119,8 @@ class Parser:
 			alt = []
 
 			for topic, msg, t in bag.read_messages(topics=[self.roverGpsTopic]):
-					sec.append(msg.header.stamp.secs)
-					nsec.append(msg.header.stamp.nsecs)
+					sec.append(t.secs)
+					nsec.append(t.nsecs)
 					px.append(msg.position[0])
 					py.append(msg.position[1])
 					pz.append(msg.position[2])
@@ -148,8 +149,8 @@ class Parser:
                 vz = []
 
                 for topic, msg, t in bag.read_messages(topics=[self.baseOdomTopic]):
-                        sec.append(msg.header.stamp.secs)
-                        nsec.append(msg.header.stamp.nsecs)
+                        sec.append(t.secs)
+                        nsec.append(t.nsecs)
                         pn.append(msg.pose.pose.position.x)
                         pe.append(msg.pose.pose.position.y)
                         pd.append(msg.pose.pose.position.z)
@@ -162,6 +163,22 @@ class Parser:
                         vz.append(msg.twist.twist.linear.z)
 
                 return RelPos(sec,nsec,pn,pe,pd), Odom(sec,nsec,0.0,0.0,0.0,qx,qy,qz,qw,vx,vy,vz)
+
+	def get_velocity(self, bag):
+                sec = []
+                nsec = []
+                vx = []
+                vy = []
+                vz = []
+
+                for topic, msg, t in bag.read_messages(topics=[self.baseVelTopic]):
+                        sec.append(t.secs)
+                        nsec.append(t.nsecs)
+                        vx.append(msg.x)
+                        vy.append(msg.y)
+                        vz.append(msg.z)
+
+                return Vec3(sec,nsec,vx,vy,vz)
 
 
 class FlightMode:
@@ -212,5 +229,12 @@ class refLla:
 		self.lat = lat[0]
 		self.lon = lon[0]
 		self.alt = alt[0]
+
+class Vec3:
+	def __init__(self,sec,nsec,x,y,z):
+		self.time = np.array(sec)+np.array(nsec)*1E-9
+		self.x = x
+		self.y = y
+		self.z = z
 
 

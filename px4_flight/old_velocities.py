@@ -6,35 +6,23 @@ import numpy as np
 import navpy
 
 def main():
-	flightModeTopic = '/flight_mode'
-	missionStateTopic = '/mission_state'
-	baseGpsTopic = '/base/PosVelEcef'
-	baseImuTopic = '/base/imu'
-	roverRelPosTopic = '/rover/RelPos'
+	flightModeTopic = '/dummyTopic'
+	missionStateTopic = '/dummyTopic'
+	baseGpsTopic = '/boat/PosVelEcef'
+	baseImuTopic = '/dummyTopic'
+	roverRelPosTopic = '/dummyTopic'
 	roverGpsTopic = '/rover/PosVelEcef'
-	baseOdomTopic = '/base_odom'
-	data = Parser(flightModeTopic,missionStateTopic,baseGpsTopic,baseImuTopic,roverRelPosTopic,roverGpsTopic,baseOdomTopic)
+	baseOdomTopic = '/dummyTopic'
+	baseVelTopic = '/base_velocity'
+	data = Parser(flightModeTopic,missionStateTopic,baseGpsTopic,baseImuTopic,roverRelPosTopic,roverGpsTopic,baseOdomTopic,baseVelTopic)
 	filename = 'flightD.bag'
-	bag = rosbag.Bag('/home/matt/data/px4flight/outdoor/0420/' + filename)
+	bag = rosbag.Bag('/home/matt/data/px4flight/outdoor/0318/' + filename)
 
-	flightMode,missionState,estOdom,estRelPos,baseGps,roverGps,refLla = get_data(data,bag)
+	baseGps,roverGps,refLla = get_data(data,bag)
 
 	baseGpsNed = ecef2ned(baseGps,refLla)
 	roverGpsNed = ecef2ned(roverGps,refLla)
 
-	# timeOfFlight,timeInterval = calc_time_of_flight(flightMode,missionState)
-	# timeOfFlightList.append(timeOfFlight)
-
-	# get_pn_data(ubloxRelPos,estRelPos)
-	# get_pe_data(ubloxRelPos,estRelPos)
-	# get_pd_data(ubloxRelPos,estRelPos)
-	get_ub_data(estOdom,baseGpsNed)
-	get_vb_data(estOdom,baseGpsNed)
-	get_wb_data(estOdom,baseGpsNed)
-
-	check_odom_vs_rover_u(estOdom,roverGpsNed,estRelPos)
-	check_odom_vs_rover_v(estOdom,roverGpsNed)
-	check_odom_vs_rover_w(estOdom,roverGpsNed)
 	check_base_vs_rover_u(baseGpsNed,roverGpsNed)
 	check_base_vs_rover_v(baseGpsNed,roverGpsNed)
 	check_base_vs_rover_w(baseGpsNed,roverGpsNed)
@@ -72,32 +60,12 @@ def find_time_interval_indeces(x,timeInterval):
 	return timeIntervalIndeces
 
 def get_data(data, bag):
-	flightMode = data.get_flight_mode(bag)
-	missionState = data.get_mission_state(bag)
-
-	estRelPos, estOdom = data.get_odom(bag)
-	# estRelPos.time -= estRelPos.time[0]
-	# estRelPos.time += timeOffset[0]
-
-	# imu = data.get_imu(bag)
-	# imu.time -= imu.time[0]
-	# imu.time += timeOffset[4]
-
-	# measuredRelPos = data.get_ublox_relPos(bag)
-	# measuredRelPos.time -= measuredRelPos.time[0]
-	# measuredRelPos.time += timeOffset[5]
 
 	baseGps = data.get_base_gps(bag)
 
 	roverGps,refLla = data.get_rover_gps(bag)
-	# roverGps.time -= roverGps.time[0]
-	# roverGps.time += timeOffset[7]
 
-	# rtkCompass = data.get_rtk_compass(bag)
-	# rtkCompass.time -= rtkCompass.time[0]
-	# rtkCompass.time += timeOffset[8]
-
-	return flightMode, missionState, estOdom, estRelPos, baseGps, roverGps, refLla
+	return baseGps, roverGps, refLla
 
 def ecef2ned(gps,refLla):
 	ecefOrigin1D = navpy.lla2ecef(refLla.lat,refLla.lon,refLla.alt)
