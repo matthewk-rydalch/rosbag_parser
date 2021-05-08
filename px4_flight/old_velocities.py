@@ -14,8 +14,8 @@ def main():
 	roverGpsTopic = '/rover/PosVelEcef'
 	baseOdomTopic = '/base_odom'
 	data = Parser(flightModeTopic,missionStateTopic,baseGpsTopic,baseImuTopic,roverRelPosTopic,roverGpsTopic,baseOdomTopic)
-	filename = '0422_moving.bag'
-	bag = rosbag.Bag('/home/matt/data/px4flight/outdoor/0422/' + filename)
+	filename = 'flightA.bag'
+	bag = rosbag.Bag('/home/matt/data/px4flight/outdoor/0424/' + filename)
 
 	flightMode,missionState,estOdom,estRelPos,baseGps,roverGps,refLla = get_data(data,bag)
 

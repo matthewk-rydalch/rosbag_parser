@@ -9,7 +9,7 @@ def main():
 	mocapTopic = '/boat_landing_platform_ned'
 	baseEulerTopic = '/base_euler'
 	data = Parser(mocapTopic,baseEulerTopic)
-	filename = 'm2u_w_boat.bag'
+	filename = 'test13.bag'
 	bag = rosbag.Bag('/home/matt/data/mocap/' + filename)
 
 	baseEuler, mocapQuat = get_data(data,bag)
