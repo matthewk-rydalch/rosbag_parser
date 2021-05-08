@@ -18,8 +18,8 @@ def main():
 
 	#### Standard ####
 	## flight A 0424
-	# bag = rosbag.Bag('/home/matt/data/px4flight/outdoor/0424/flightA.bag')
-	# timeInterval = [1619195374.0,1619195396.0]
+	bag = rosbag.Bag('/home/matt/data/px4flight/outdoor/0424/flightA.bag')
+	timeInterval = [1619195374.0,1619195396.0]
 	## flight B 0424
 	# bag = rosbag.Bag('/home/matt/data/px4flight/outdoor/0424/flightB.bag')
 	# timeInterval = [1619195667.0,1619195689.0]
@@ -63,8 +63,8 @@ def main():
 	# bag = rosbag.Bag('/home/matt/data/px4flight/outdoor/0420/flightg.bag')
 	# timeInterval = [1618694713.0,1618694782.0]
 	## flight H 0420
-	bag = rosbag.Bag('/home/matt/data/px4flight/outdoor/0420/flightH.bag')
-	timeInterval = [1618695170.0,1618695308.0]
+	# bag = rosbag.Bag('/home/matt/data/px4flight/outdoor/0420/flightH.bag')
+	# timeInterval = [1618695170.0,1618695308.0]
 
 
 	if baseEstimation:
@@ -83,9 +83,16 @@ def plot_trajectory(bag,timeInterval,roverOdomTopic,hlcTopic):
 	hlcTime = data.get_hlc(bag)
 	errorTime = get_error(posTime,hlcTime)
 
-	plot2_interval(posTime.time,posTime.position[0],hlcTime.time,hlcTime.position[0],timeInterval,1)
-	plot2_interval(posTime.time,posTime.position[1],hlcTime.time,hlcTime.position[1],timeInterval,2)
-	plot2_interval(posTime.time,posTime.position[2],hlcTime.time,hlcTime.position[2],timeInterval,3)
+	labelPosX = 'pn'
+	labelPosY = 'pe'
+	labelPosZ = 'pd'
+	labelHlcX = 'pn_c'
+	labelHlcY = 'pe_c'
+	labelHlcZ = 'pd_c'
+
+	plot2_interval(posTime.time,posTime.position[0],hlcTime.time,hlcTime.position[0],labelPosX,labelHlcX,timeInterval,1)
+	plot2_interval(posTime.time,posTime.position[1],hlcTime.time,hlcTime.position[1],labelPosY,labelHlcY,timeInterval,2)
+	plot2_interval(posTime.time,posTime.position[2],hlcTime.time,hlcTime.position[2],labelPosZ,labelHlcZ,timeInterval,3)
 	plot3_interval(errorTime,timeInterval,4)
 
 	plt.show()
@@ -112,7 +119,7 @@ def get_error(posTime,hlcTime):
 	return errorTime
 	
 
-def plot2_interval(t,x,tc,xc,timeInterval,figNum):
+def plot2_interval(t,x,tc,xc,labelX,labelXc,timeInterval,figNum):
 	tInterval = []
 	xInterval = []
 	tcInterval = []
@@ -127,9 +134,9 @@ def plot2_interval(t,x,tc,xc,timeInterval,figNum):
 			tcInterval.append(tc[j] - timeInterval[0])
 			xcInterval.append(xc[j])
 	plt.figure(figNum)
-	plt.plot(tInterval,xInterval,label = 'pos')
-	plt.plot(tcInterval,xcInterval,label = 'hlc')
-	plt.legend(bbox_to_anchor=(1.05,1))
+	plt.plot(tInterval,xInterval,label = labelX)
+	plt.plot(tcInterval,xcInterval,label = labelXc)
+	plt.legend(bbox_to_anchor=(1.2,1))
 	plt.tight_layout()
 
 def plot3_interval(posTimeStruct,timeInterval,figNum):
