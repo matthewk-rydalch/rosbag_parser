@@ -20,12 +20,8 @@ def main():
     data = Parser(mocapTopic, baseOdomTopic, roverOdomTopic, roverNEDTopic, boatNEDTopic,mocapEulerTopic, baseEulerTopic)
 
 	# Specify the file and location of the bag file you want to extract data from
-<<<<<<< HEAD
-    filename = 'cf-kp04-ki005-copy2.bag'
-=======
-    filename = 'cf-kp04-ki00.bag'
->>>>>>> ce21aa0... Updated mocap and px4_flight parsers
-    bag = rosbag.Bag('../gainsTesting/' + filename)
+    filename = 'cf-kp04-ki008.bag'
+    bag = rosbag.Bag('../../gainsTesting/boat-motion-11-24/kp04-ki0-008/' + filename)
 
     odom, boatOdom, truth, boatTruth, mocapEuler, baseEuler = get_data(data, bag)
 

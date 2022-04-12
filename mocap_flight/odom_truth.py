@@ -19,15 +19,15 @@ def main():
 	data = Parser(mocapTopic, baseOdomTopic, roverOdomTopic, roverNEDTopic, boatNEDTopic,roverEulerTopic, baseEulerTopic)
 
 	# Specify the file and location of the bag file you want to extract data from
-	filename = 'm2u_w_boat_2021-10-15-21-28-51.bag'
-	bag = rosbag.Bag('../mocap data/' + filename)
+	filename = 'anomally.bag'
+	bag = rosbag.Bag('../../mocap_anom/' + filename)
 
 	odom, boatOdom, truth, boatTruth = get_data(data, bag)
 
 	fig_num = 1
 	fig_num = get_north_data(odom[0], boatOdom, truth, boatTruth, fig_num)
-	# fig_num = get_east_data(odom[0], boatOdom, truth, boatTruth, fig_num)
-	# fig_num = get_down_data(odom[0], boatOdom, truth, boatTruth, fig_num)
+	fig_num = get_east_data(odom[0], boatOdom, truth, boatTruth, fig_num)
+	fig_num = get_down_data(odom[0], boatOdom, truth, boatTruth, fig_num)
 	plt.show()
 	#get_down_data(odom, boatOdom, truth, boatTruth)
 

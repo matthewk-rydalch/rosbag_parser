@@ -24,7 +24,8 @@ class Parser:
 			sec.append(t.secs)
 			nsec.append(t.nsecs)
 			flightMode.append(msg.point.x)
-
+			for part in msg:
+				print(part)
 		return FlightMode(sec,nsec,flightMode)
 
 	def get_mission_state(self, bag):
