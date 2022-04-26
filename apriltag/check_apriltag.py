@@ -11,28 +11,51 @@ baseOdomTopic = '/base_odom'
 baseMocapTopic = '/boat_landing_platform_ned'
 roverMocapTopic = '/rhodey_ned'
 tagTopic = '/tag_detections'
-bagfile = '/home/tpool2/apriltag-03.bag'
+tagOdomTopic = '/april_odom'
+tagHatTopic = '/at_hat'
 
-# parser = Parser(bagfile, baseGpsTopic, roverRelPosTopic, roverGpsTopic, baseOdomTopic, baseMocapTopic, roverMocapTopic, tagTopic)
+bagfile = 'at_test1'
 
-# parser.parse_and_save()
+bagdir = '/home/boatlanding/datasets/rosbags/at_test/{}.bag'.format(bagfile)
 
-mocap_data = np.load("apriltag-03_rhodey_ned.npz")
-mocap_base_data = np.load("apriltag-03_boat_landing_platform_ned.npz")
-odom_data = np.load("apriltag-03_base_odom.npz")
+parser = Parser(bagdir, baseGpsTopic, roverRelPosTopic, roverGpsTopic, baseOdomTopic, baseMocapTopic, roverMocapTopic, tagTopic, tagOdomTopic, tagHatTopic)
 
-fig = plt.figure()
+parser.parse_and_save()
+
+mocap_data = np.load("{}_rhodey_ned.npz".format(bagfile))
+mocap_base_data = np.load("{}_boat_landing_platform_ned.npz".format(bagfile))
+odom_data = np.load("{}_base_odom.npz".format(bagfile))
+
+
+# Plot truth vs estimate
+fig = plt.figure(1)
 ax = plt.axes(projection='3d')
 
-true_n = np.array(mocap_data["pn"]) - np.array(mocap_base_data["pn"])
-true_e = np.array(mocap_data["pd"]) - np.array(mocap_base_data["pd"])
-true_d = np.array(mocap_data["pd"]) - np.array(mocap_base_data["pd"])
-# for idx in range(len(mocap_data["pn"])):
-#     true_n.append(mocap_data["pn"][idx] - mocap_base_data["pn"][idx] )
-#     true_e.append(mocap_data["pe"][idx]  - mocap_base_data["pe"][idx] )
-#     true_d.append(mocap_data["pd"][idx]  - mocap_base_data["pd"][idx] )
-
-ax.plot3D(true_n, true_e, true_d)
+ax.plot3D(-mocap_data["pn"],-mocap_data["pe"], np.array(-mocap_data["pd"])-.18)
 ax.plot3D(odom_data["pn"], odom_data["pe"], odom_data["pd"])
+
+
+# Plot odom estimate vs odom based on apriltag
+fig = plt.figure(2)
+ax = plt.axes(projection='3d')
+tag_odom_data = np.load("{}_april_odom.npz".format(bagfile))
+
+ax.scatter3D(tag_odom_data["pn"], tag_odom_data["pe"], tag_odom_data["pd"])
+ax.plot3D(odom_data["pn"], odom_data["pe"], odom_data["pd"])
+
+
+# Plot apriltag vs expected apriltag
+fig, ax = plt.subplots(3,1)
+
+tag_hat_data = np.load("{}_at_hat.npz".format(bagfile))
+tag_data = np.load("{}_tag_detections.npz".format(bagfile))
+
+ax[0].scatter(tag_data["seq"], tag_data["x"], label="measured")
+ax[0].scatter(tag_data["seq"], tag_hat_data["x"], label="expected")
+ax[1].scatter(tag_data["seq"], tag_data["y"])
+ax[1].scatter(tag_data["seq"], tag_hat_data["y"])
+ax[2].scatter(tag_data["seq"], tag_data["z"])
+ax[2].scatter(tag_data["seq"], tag_hat_data["z"])
+ax[0].legend(loc='upper right')
 plt.show()
 

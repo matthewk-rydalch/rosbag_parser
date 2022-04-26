@@ -5,9 +5,14 @@ import numpy as np
 from scipy.spatial.transform import Rotation as R
 
 class Parser:
-	def __init__(self, bagfile,baseGpsTopic,roverRelPosTopic,roverGpsTopic,baseOdomTopic,baseMocapTopic,roverMocapTopic,tagDetectTopic):
+	def __init__(self, bagfile,baseGpsTopic,roverRelPosTopic,roverGpsTopic,baseOdomTopic,
+				baseMocapTopic,roverMocapTopic,tagDetectTopic,tagOdomTopic, tagHatTopic, roverAirsimTopic=None):
+
 		self.tagDetectTopic = tagDetectTopic
+		self.tagOdomTopic = tagOdomTopic
+		self.tagHatTopic = tagHatTopic
 		self.roverMocapTopic = roverMocapTopic
+		self.roverAirsimTopic = roverAirsimTopic
 		self.baseGpsTopic = baseGpsTopic
 		self.baseMocapTopic = baseMocapTopic
 		self.roverRelPosTopic = roverRelPosTopic
@@ -18,9 +23,14 @@ class Parser:
 
 
 	def parse_and_save(self):
-		self.get_base_mocap()
-		self.get_rover_mocap()
+		self.get_base_mocap()	
+		self.get_rover_mocap()	
+		self.get_airsim()
 		self.get_odom()
+		self.get_tag()
+		self.get_tag_odom()
+		self.get_tag()
+		self.get_tag_hat()
 
 
 	def get_base_gps(self, bag):
@@ -78,52 +88,54 @@ class Parser:
 		return RelPos(sec,nsec,pn,pe,pd,pnHp,peHp,pdHp)
 
 	def get_rover_mocap(self):
-		data = {}
-		data["pn"] = []
-		data["pe"] = []
-		data["pd"] = []
-		data["qx"] = []
-		data["qy"] = []
-		data["qz"] = []
-		data["qw"] = []
-		data["sec"] = []
-		data["nsec"] = []
-		for topic, msg, t in self.bag.read_messages(topics=[self.roverMocapTopic]):
-			data["sec"].append(t.secs)
-			data["nsec"].append(t.nsecs)
-			data["pn"].append(msg.pose.position.x)
-			data["pe"].append(msg.pose.position.y)
-			data["pd"].append(msg.pose.position.z)
-			data["qx"].append(msg.pose.orientation.x)
-			data["qy"].append(msg.pose.orientation.y)
-			data["qz"].append(msg.pose.orientation.z)
-			data["qw"].append(msg.pose.orientation.w)
-		npz_file = self.bag.filename.split("/")[-1].split(".")[0] + "_"+ self.roverMocapTopic.split("/")[1] +".npz"
-		np.savez(npz_file, **data)
+		if self.roverMocapTopic is not None:
+			data = {}										
+			data["pn"] = []
+			data["pe"] = []
+			data["pd"] = []
+			data["qx"] = []
+			data["qy"] = []
+			data["qz"] = []
+			data["qw"] = []
+			data["sec"] = []
+			data["nsec"] = []
+			for topic, msg, t in self.bag.read_messages(topics=[self.roverMocapTopic]):
+				data["sec"].append(t.secs)
+				data["nsec"].append(t.nsecs)
+				data["pn"].append(msg.pose.position.x)
+				data["pe"].append(msg.pose.position.y)
+				data["pd"].append(msg.pose.position.z)
+				data["qx"].append(msg.pose.orientation.x)
+				data["qy"].append(msg.pose.orientation.y)
+				data["qz"].append(msg.pose.orientation.z)
+				data["qw"].append(msg.pose.orientation.w)
+			npz_file = self.bag.filename.split("/")[-1].split(".")[0] + "_"+ self.roverMocapTopic.split("/")[1] +".npz"
+			np.savez(npz_file, **data)
 
 	def get_base_mocap(self):
-		data = {}
-		data["pn"] = []
-		data["pe"] = []
-		data["pd"] = []
-		data["qx"] = []
-		data["qy"] = []
-		data["qz"] = []
-		data["qw"] = []
-		data["sec"] = []
-		data["nsec"] = []
-		for topic, msg, t in self.bag.read_messages(topics=[self.baseMocapTopic]):
-			data["sec"].append(t.secs)
-			data["nsec"].append(t.nsecs)
-			data["pn"].append(msg.pose.position.x)
-			data["pe"].append(msg.pose.position.y)
-			data["pd"].append(msg.pose.position.z)
-			data["qx"].append(msg.pose.orientation.x)
-			data["qy"].append(msg.pose.orientation.y)
-			data["qz"].append(msg.pose.orientation.z)
-			data["qw"].append(msg.pose.orientation.w)
-		npz_file = self.bag.filename.split("/")[-1].split(".")[0] + "_"+ self.baseMocapTopic.split("/")[1] +".npz"
-		np.savez(npz_file, **data)
+		if self.baseMocapTopic is not None:
+			data = {}
+			data["pn"] = []
+			data["pe"] = []
+			data["pd"] = []
+			data["qx"] = []
+			data["qy"] = []
+			data["qz"] = []
+			data["qw"] = []
+			data["sec"] = []
+			data["nsec"] = []
+			for topic, msg, t in self.bag.read_messages(topics=[self.baseMocapTopic]):
+				data["sec"].append(t.secs)
+				data["nsec"].append(t.nsecs)
+				data["pn"].append(msg.pose.position.x)
+				data["pe"].append(msg.pose.position.y)
+				data["pd"].append(msg.pose.position.z)
+				data["qx"].append(msg.pose.orientation.x)
+				data["qy"].append(msg.pose.orientation.y)
+				data["qz"].append(msg.pose.orientation.z)
+				data["qw"].append(msg.pose.orientation.w)
+			npz_file = self.bag.filename.split("/")[-1].split(".")[0] + "_"+ self.baseMocapTopic.split("/")[1] +".npz"
+			np.savez(npz_file, **data)
 
 		
 
@@ -192,6 +204,67 @@ class Parser:
 
 		npz_file = self.bag.filename.split("/")[-1].split(".")[0] + "_"+ self.baseOdomTopic.split("/")[1] +".npz"
 		np.savez(npz_file, **data)
+
+	def get_tag_odom(self):
+
+		data = {}
+		data["pn"] = []
+		data["pe"] = []
+		data["pd"] = []
+		data["sec"] = []
+		data["nsec"] = []
+		
+		for topic, msg, t in self.bag.read_messages(topics=[self.tagOdomTopic]):
+				data["sec"].append(t.secs)
+				data["nsec"].append(t.nsecs)
+				data["pn"].append(msg.pose.pose.position.x)
+				data["pe"].append(msg.pose.pose.position.y)
+				data["pd"].append(msg.pose.pose.position.z)
+
+		npz_file = self.bag.filename.split("/")[-1].split(".")[0] + "_"+ self.tagOdomTopic.split("/")[1] +".npz"
+		np.savez(npz_file, **data)
+
+
+	
+	def get_tag_hat(self):
+
+		data = {}
+		data["x"] = []
+		data["y"] = []
+		data["z"] = []
+		data["seq"] = []
+
+		for topic, msg, t in self.bag.read_messages(topics=[self.tagHatTopic]):
+				data["x"].append(msg.vector.x)
+				data["y"].append(msg.vector.y)
+				data["z"].append(msg.vector.z)
+				data["seq"].append(msg.header.seq)
+
+		npz_file = self.bag.filename.split("/")[-1].split(".")[0] + "_"+ self.tagHatTopic.split("/")[1] +".npz"
+		np.savez(npz_file, **data)
+
+
+	def get_tag(self):
+
+		data = {}
+		data["x"] = []
+		data["y"] = []
+		data["z"] = []
+		data["seq"] = []
+		seq = 1
+
+		for topic, msg, t in self.bag.read_messages(topics=[self.tagDetectTopic]):
+				if msg.detections:
+					data["x"].append(msg.detections[0].pose.pose.pose.position.x)
+					data["y"].append(msg.detections[0].pose.pose.pose.position.y)
+					data["z"].append(msg.detections[0].pose.pose.pose.position.z)
+					data["seq"].append(seq)
+					seq+=1
+
+		npz_file = self.bag.filename.split("/")[-1].split(".")[0] + "_"+ self.tagDetectTopic.split("/")[1] +".npz"
+		np.savez(npz_file, **data)
+
+		
 		
 	def get_boat_odom(self, bag):
 
@@ -213,6 +286,39 @@ class Parser:
 		boat = pos_orient_time(boat_sec, boat_nsec, boat_x, boat_y, boat_z, boat_orientation)
 
 		return boat
+
+	def get_airsim(self):
+		if self.roverAirsimTopic is not None:
+			data = {}	
+			data["pn"] = []
+			data["pe"] = []
+			data["pd"] = []
+			data["qx"] = []
+			data["qy"] = []
+			data["qz"] = []
+			data["qw"] = []
+			data["sec"] = []
+			data["nsec"] = []
+			data["vx"] = []
+			data["vy"] = []
+			data["vz"] = []
+
+			for topic, msg, t in self.bag.read_messages(topics=[self.baseOdomTopic]):
+					data["sec"].append(t.secs)
+					data["nsec"].append(t.nsecs)
+					data["pn"].append(msg.pose.pose.position.x)
+					data["pe"].append(msg.pose.pose.position.y)
+					data["pd"].append(msg.pose.pose.position.z)
+					data["qx"].append(msg.pose.pose.orientation.x)
+					data["qy"].append(msg.pose.pose.orientation.y)
+					data["qz"].append(msg.pose.pose.orientation.z)
+					data["qw"].append(msg.pose.pose.orientation.w)
+					data["vx"].append(msg.twist.twist.linear.x)
+					data["vy"].append(msg.twist.twist.linear.y)
+					data["vz"].append(msg.twist.twist.linear.z)
+
+			npz_file = self.bag.filename.split("/")[-1].split(".")[0] + "_"+ self.roverAirsimTopic.split("/")[1] +".npz"
+			np.savez(npz_file, **data)
 
 
 class FlightMode:
